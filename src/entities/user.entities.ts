@@ -10,7 +10,7 @@ export enum UserStatus {
   ACTIVE = "ACTIVE",
   PENDING = "PENDING",
   SUSPENDED = "SUSPENDED",
-  DELETED = "DELETED",
+  DELETED = "DELETED"
 }
 
 export enum AuthProvider {
@@ -36,7 +36,7 @@ export class User {
   @Column({ type: "timestamp", nullable: true })
   password_changed_at?: Date;
 
-  @Column({ type: "enum", enum: UserStatus })
+  @Column({ type: "enum", enum: UserStatus, default: UserStatus.ACTIVE })
   status!: UserStatus;
 
   @Column({type: "boolean", default: true })
