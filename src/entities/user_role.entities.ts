@@ -30,7 +30,7 @@ export class UserRole {
   @JoinColumn({ name: "assigned_by" })
   assigned_by?: User;
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   assigned_at!: Date;
 
   @Column({ type: "boolean", default: true })

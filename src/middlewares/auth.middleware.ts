@@ -16,7 +16,7 @@ export const authMiddleware = (
 
       if (!authHeader) {
          return res.status(401).json({
-            status: false,
+            success: false,
             message: "Authorization Header is missing",
          });
       }
@@ -24,7 +24,7 @@ export const authMiddleware = (
       const token = authHeader.split(" ")[1];
       if (!token) {
          return res.status(401).json({
-            status: false,
+            success: false,
             message: "Token is missing",
          });
       }
@@ -32,7 +32,7 @@ export const authMiddleware = (
       const secretKey = process.env.JWT_SECRET_KEY;
       if (!secretKey) {
          return res.status(500).json({
-            status: false,
+            success: false,
             message: "JWT secretKey is not configured",
          });
       }
@@ -44,7 +44,7 @@ export const authMiddleware = (
       next();
    } catch (err) {
       return res.status(401).json({
-         status: false,
+         success: false,
          message: "Invalid or expired token",
       });
    }

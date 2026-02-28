@@ -14,8 +14,8 @@ import type{ UserRole } from "./user_role.entities.js";
 
 @Entity("roles")
 export class Role {
-  @PrimaryGeneratedColumn("uuid", { name: "role_id" })
-  id!: string;
+  @PrimaryGeneratedColumn("uuid")
+  role_id!: string;
 
   @Column({ type: "varchar", unique: true })
   role_name!: string; // ADMIN | DOCTOR | PATIENT

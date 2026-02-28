@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response) => {
       const dto: LoginDto = req.body;
       const { user, token } = await authService.login(dto);
       res.status(200).json({
-         status: true,
+         success: true,
          message: "Login Successfully!",
          data: {
             user_id: user.user_id,
@@ -19,7 +19,7 @@ export const login = async (req: Request, res: Response) => {
       })
    }catch(err: any){
       res.status(401).json({
-         status: false,
+         success: false,
          message: err.message,
       })
    }
@@ -30,7 +30,7 @@ export const register = async (req: Request, res: Response) => {
       const dto: RegisterDto = req.body;
       const user = await authService.register(dto);
       res.status(201).json({
-         status: true,
+         success: true,
          message: "User Register Successfully!",
          data: {
             user_id: user.user_id,
@@ -39,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
       })
    }catch(err: any){
       res.status(400).json({
-         status: false,
+         success: false,
          message: err.message
       })
    }
