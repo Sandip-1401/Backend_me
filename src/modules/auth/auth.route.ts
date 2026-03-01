@@ -10,7 +10,7 @@ authRoute.post("/register", register);
 authRoute.get("/test", authMiddleware, (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Auth middleware working",
+    message: "Protected route working",
     user: (req as any).user
   });
 });   
