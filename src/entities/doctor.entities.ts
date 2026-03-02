@@ -8,8 +8,9 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  OneToOne,
 } from "typeorm";
-import type{ User } from "./user.entities.js";
+import { User } from "./user.entities.js";
 import type{ Department } from "./department.entities.js";
 import type{ Address } from "./address.entities.js";
 import type{ DoctorScheduling } from "./doctor_scheduling.entities.js";
@@ -23,12 +24,12 @@ export enum DoctorStatus {
   SUSPENDED = "SUSPENDED",
 }
 
-@Entity("doctor")
+@Entity("doctors")
 export class Doctor {
   @PrimaryGeneratedColumn("uuid")
   doctor_id!: string;
 
-  @ManyToOne("User", { nullable: false })
+  @OneToOne("User", { nullable: false })
   @JoinColumn({ name: "user_id" })
   user!: User;
 
@@ -40,22 +41,19 @@ export class Doctor {
   @JoinColumn({ name: "address_id" })
   address?: Address;
 
-  @Column({ type: "varchar", unique: true })
-  registration_number!: string;
-
   @Column({ type: "varchar" })
   qualification!: string;
 
   @Column({ type: "int" })
   experience_years!: number;
 
-  @Column({ type: "decimal", nullable: true })
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
   consultation_fee?: number;
 
   @Column({ type: "boolean", default: true })
   is_available!: boolean;
 
-  @Column({ type: "enum", enum: DoctorStatus })
+  @Column({ type: "enum", enum: DoctorStatus, default: DoctorStatus.ACTIVE })
   status!: DoctorStatus;
 
   @CreateDateColumn({ type: "timestamp" })
