@@ -13,7 +13,7 @@ import type{ User } from "./user.entities.js";
 import type{ Role } from "./roles.entities.js";
 
 @Entity("user_role")
-@Index(["user", "role"], { unique: true }) // (user_id, role_id) unique
+// @Index(["user", "role"], { unique: true })deleted...ok...
 export class UserRole {
   @PrimaryGeneratedColumn("uuid")
   user_role_id!: string;

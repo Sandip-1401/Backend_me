@@ -5,6 +5,10 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
+  UpdateDateColumn,
+  OneToOne,
 } from "typeorm";
 import type { User } from "./user.entities.js";
 import type { Address } from "./address.entities.js";
@@ -28,12 +32,12 @@ export enum PatientStatus {
   DECEASED = "DECEASED",
 }
 
-@Entity("patient")
+@Entity("patients")
 export class Patient {
   @PrimaryGeneratedColumn("uuid")
   patient_id!: string;
 
-  @ManyToOne("User", { nullable: false })
+  @OneToOne("User", { nullable: false })
   @JoinColumn({ name: "user_id" })
   user!: User;
 
@@ -50,13 +54,13 @@ export class Patient {
   @Column({ type: "enum", enum: Gender, nullable: true })
   gender?: Gender;
 
-  @Column({ type: "decimal", nullable: true })
+  @Column({ type: "decimal", precision: 5, scale: 2, nullable: true })
   height?: number;
 
-  @Column({ type: "decimal", nullable: true })
+  @Column({ type: "decimal", precision: 5, scale: 2, nullable: true })
   weight?: number;
 
-  @Column({ type: "enum", enum: PatientStatus })
+  @Column({ type: "enum", enum: PatientStatus, default: PatientStatus.ACTIVE })
   status!: PatientStatus;
 
   @OneToMany("Appointment", "patient")
@@ -79,4 +83,13 @@ export class Patient {
 
   @OneToMany("EmergencyInfo", "patient")
   emergency_contacts!: EmergencyInfo[];
+
+  @CreateDateColumn()
+  created_at!: Date;
+
+  @UpdateDateColumn()
+  updated_at!: Date;
+
+  @DeleteDateColumn()
+  deleted_at?: Date;
 }
