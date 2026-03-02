@@ -17,7 +17,7 @@ export enum AppointmentStatusName {
 @Entity("appointment_status")
 export class AppointmentStatus {
   @PrimaryGeneratedColumn("uuid")
-  status_id!: string;
+  appointment_status_id!: string;
 
   @Column({
     type: "enum",
