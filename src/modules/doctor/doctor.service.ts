@@ -81,7 +81,7 @@ export class DoctorService {
       if(!doctorRole) throw new Error("Doctor role not found");
 
       const saved = await this.userRoleRepository.assignRole(user, doctorRole);
-console.log("Saved userRole:", saved);       
+      console.log("Saved userRole:", saved);       
 
       return doctor;
    }
