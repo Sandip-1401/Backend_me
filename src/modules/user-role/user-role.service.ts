@@ -25,17 +25,27 @@ export class UserRoleService{
          throw new Error("Role not found");
       }
 
-      const duplicateAssignRole = await this.userRoleRepository.findByUserAndRole(user, role);
-
-      if(duplicateAssignRole){
+      const existingRole = await this.userRoleRepository.findByUserAndRole(user, role);
+      
+      if(existingRole){
+         if(existingRole.deleted_at){
+            existingRole.deleted_at = null,
+            existingRole.is_active = true,
+            existingRole.updated_at = new Date();
+         }
          throw new Error("User already has this role");
       }
 
       let assignedBy: User | undefined;
+
       if(assignedByUserId){
          assignedBy = await this.userRepository.findOne({ //findOne() ka return type hota hai: User | null....assignedBy MUST be User....agar null mila to kya karega?
             where: {user_id: assignedByUserId}
          }) ?? undefined
+
+         if (!assignedBy) {
+         throw new Error("AssignedBy user not found");
+      }
       }
 
       return await this.userRoleRepository.assignRole(user, role, assignedBy)

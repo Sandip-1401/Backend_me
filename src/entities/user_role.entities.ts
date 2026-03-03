@@ -13,7 +13,7 @@ import type{ User } from "./user.entities.js";
 import type{ Role } from "./roles.entities.js";
 
 @Entity("user_role")
-// @Index(["user", "role"], { unique: true })deleted...ok...
+@Index(["user", "role"], { unique: true })
 export class UserRole {
   @PrimaryGeneratedColumn("uuid")
   user_role_id!: string;
@@ -43,5 +43,5 @@ export class UserRole {
   updated_at?: Date;
 
   @DeleteDateColumn({ type: "timestamp", nullable: true })
-  deleted_at?: Date;
+  deleted_at?: Date | null;
 }

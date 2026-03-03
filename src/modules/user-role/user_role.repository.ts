@@ -19,7 +19,6 @@ export class UserRoleRepository{
          where: {
             user: {user_id: user.user_id},
             role: {role_id: role.role_id},
-            is_active: true
          },
          relations: ["user", "role"]
       })
