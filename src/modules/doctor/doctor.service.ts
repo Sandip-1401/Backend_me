@@ -1,3 +1,4 @@
+import { AppError } from "../../common/errors/AppError";
 import { AppDataSource } from "../../config/datasource";
 import { Address } from "../../entities/address.entities";
 import { Department } from "../../entities/department.entities";
@@ -78,7 +79,8 @@ export class DoctorService {
    
    async getDoctorById(doctorId: string) {
       const doctor = await this.doctorRepository.findByDoctorId(doctorId);
-      if (!doctor) throw new Error("Doctor not found");
+      // if (!doctor) throw new Error("Doctor not found");
+      if(!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
       return doctor;
    }
 

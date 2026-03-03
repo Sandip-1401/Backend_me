@@ -1,6 +1,8 @@
 import { Response } from "express";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 import { DoctorService } from "./doctor.service";
+import { successResponse } from "../../common/utils/successResponse";
+import { asyncHandler } from "../../common/utils/asyncHandler";
 
 export class DoctorController {
    private doctorService = new DoctorService();
@@ -43,22 +45,12 @@ export class DoctorController {
    };
 
    // GET /:id - Kisi bhi doctor ka profile dekho (admin / public)
-   getDoctorById = async (req: AuthRequest, res: Response) => {
-      try {
-         const doctor_id = req.params.id;
-         const doctor = await this.doctorService.getDoctorById(String(doctor_id));
+   getDoctorById = asyncHandler(async (req: AuthRequest, res: Response) => {
+      const doctor_id = req.params.id;
+      const doctor = await this.doctorService.getDoctorById(String(doctor_id));
 
-         return res.status(200).json({
-            success: true,
-            data: doctor,
-         });
-      } catch (err: any) {
-         return res.status(404).json({
-            success: false,
-            message: err.message,
-         });
-      }
-   };
+      return successResponse(res, "Doctor fetched successfully", doctor);
+   });
 
    // GET / - All doctors
    getAllDoctors = async (req: AuthRequest, res: Response) => {
