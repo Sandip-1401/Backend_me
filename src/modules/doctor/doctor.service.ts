@@ -3,7 +3,10 @@ import { AppDataSource } from "../../config/datasource";
 import { Address } from "../../entities/address.entities";
 import { Department } from "../../entities/department.entities";
 import { Doctor, DoctorStatus } from "../../entities/doctor.entities";
+import { Role } from "../../entities/roles.entities";
 import { User } from "../../entities/user.entities";
+import { UserRole } from "../../entities/user_role.entities";
+import UserRoleRepository from "../user-role/user_role.repository";
 import { DoctorRepository } from "./doctor.repository";
 
 
@@ -22,6 +25,8 @@ export class DoctorService {
    private userRepository = AppDataSource.getRepository(User);
    private addressRepository = AppDataSource.getRepository(Address);
    private departmentRepository = AppDataSource.getRepository(Department);
+   private roleRepositry = AppDataSource.getRepository(Role);
+   private userRoleRepository = new UserRoleRepository();
 
    async createDoctor(
       user_id: string,
@@ -67,7 +72,18 @@ export class DoctorService {
          is_available: true,
       };
 
-      return await this.doctorRepository.createDoctor(doctorData);
+      const doctor =  await this.doctorRepository.createDoctor(doctorData);
+
+      const doctorRole = await this.roleRepositry.findOne({
+         where: {role_name: "DOCTOR"}
+      });
+
+      if(!doctorRole) throw new Error("Doctor role not found");
+
+      const saved = await this.userRoleRepository.assignRole(user, doctorRole);
+console.log("Saved userRole:", saved);       
+
+      return doctor;
    }
    
    async getDoctorByUserId(userId: string) {
