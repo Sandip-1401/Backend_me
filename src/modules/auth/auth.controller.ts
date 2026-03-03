@@ -7,14 +7,15 @@ const authService = new AuthService()
 export const login = async (req: Request, res: Response) => {
    try{  
       const dto: LoginDto = req.body;
-      const { user, token } = await authService.login(dto);
+      const { user, accessToken, refreshToken  } = await authService.login(dto);
       res.status(200).json({
          success: true,
          message: "Login Successfully!",
          data: {
             user_id: user.user_id,
             email: user.email,
-            token: token
+            accessToken: accessToken,
+            refreshToken: refreshToken
          }  
       })
    }catch(err: any){
@@ -45,3 +46,45 @@ export const register = async (req: Request, res: Response) => {
       })
    }
 }
+
+
+export const refreshToken = async (req: Request, res: Response) => {
+   try {
+      const { refreshToken } = req.body;
+
+      const result = await authService.refreshAccessToken(refreshToken);
+
+      return res.status(200).json({
+         success: true,
+         message: "Access token refreshed",
+         data: result
+      });
+
+   } catch (err: any) {
+      return res.status(401).json({
+         success: false,
+         message: err.message
+      });
+   }
+};
+
+
+export const logout = async (req: Request, res: Response) => {
+   try {
+
+      const { refreshToken } = req.body;
+
+      await authService.logout(refreshToken);
+
+      return res.status(200).json({
+         success: true,
+         message: "Logged out successfully"
+      });
+
+   } catch (err: any) {
+      return res.status(400).json({
+         success: false,
+         message: err.message
+      });
+   }
+};

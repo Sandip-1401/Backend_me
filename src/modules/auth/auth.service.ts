@@ -1,46 +1,65 @@
+import { AppError } from "../../common/errors/AppError";
+import { AppDataSource } from "../../config/datasource";
+import { RefreshToken } from "../../entities/refresh_token.entity";
 import { LoginDto, RegisterDto } from "./auth.dto";
 import { AuthRepository } from "./auth.repository";
-import bcrypt from  "bcrypt";
-import Jwt  from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import Jwt from "jsonwebtoken";
 
-export class AuthService{
+export class AuthService {
    private authRepository = new AuthRepository();
+   private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
 
-   async login(dto: LoginDto){
+   async login(dto: LoginDto) {
       const user = await this.authRepository.findByEmail(dto.email);
-      if(!user){
+      if (!user) {
          throw new Error("Invalid email or password");
       }
-      
+
       const isMatch = await bcrypt.compare(dto.password, user.password_hash);
 
-      if(!isMatch){
+      if (!isMatch) {
          throw new Error("Invalid email or password")
-      }  
+      }
 
       const secretKey = process.env.JWT_SECRET_KEY;
 
-      if(!secretKey){
+      if (!secretKey) {
          throw new Error("JWT_SECRET_KEY not defined")
       }
 
-      const token = Jwt.sign(
-         {user_id: user.user_id},
+      const accessToken = Jwt.sign(
+         { user_id: user.user_id },
          secretKey,
-         {expiresIn: "1d"}
+         { expiresIn: "15m" }
+      );
+
+      const refreshToken = Jwt.sign(
+         { user_id: user.user_id },
+         process.env.JWT_REFRESH_SECRET!,
+         { expiresIn: "7d" }
       )
 
-      return {user, token};
+      const refreshTokenEntity = this.refreshTokenRepository.create({
+         token: refreshToken,
+         user: user,
+         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+
+      await this.refreshTokenRepository.save(refreshTokenEntity);
+
+      return { user, accessToken, refreshToken };
    }
 
-   async register(dto: RegisterDto){
+   async register(dto: RegisterDto) {
       const existingUser = await this.authRepository.findByEmail(dto.email);
-      if(existingUser){
-         throw new Error("Email already exist!");
+      if (existingUser) {
+
+         throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
       }
 
       const hashedPassword = await bcrypt.hash(dto.password, 10);
-      
+
       const user = await this.authRepository.createUser({
          name: dto.name,
          email: dto.email,
@@ -48,6 +67,59 @@ export class AuthService{
          phone_number: dto.phone_no
       })
       return user;
+   };
+
+
+   async refreshAccessToken(refreshToken: string) {
+
+      if (!refreshToken) {
+         throw new Error("Refresh Token Required");
+      }
+
+      let decoded: any;
+
+      try {
+         decoded = Jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_SECRET!
+         );
+      } catch {
+         throw new Error("Invalid refresh token");
+      }
+
+      const refreshTokenEntity =
+         await this.authRepository.findUserByRefreshToken(refreshToken);
+
+      if (!refreshTokenEntity) {
+         throw new Error("Refresh token not found");
+      }
+
+      if (refreshTokenEntity.expires_at < new Date()) {
+         throw new Error("Refresh token expired");
+      }
+
+      const newAccessToken = Jwt.sign(
+         { user_id: decoded.user_id },
+         process.env.JWT_SECRET_KEY!,
+         { expiresIn: "15m" }
+      );
+
+      return { accessToken: newAccessToken };
+   };
+
+   async logout(refreshToken: string){
+      if(!refreshToken){
+         throw new Error("Refresh Token required")
+      }
+
+      const user = await this.authRepository.findUserByRefreshToken(refreshToken);
+
+      if(!user) throw new Error("Invalid refresh token")
+
+      await this.authRepository.deleteRefreshToken(refreshToken);
+
+      return {message: "Logged out successfully"}
+
    }
 }
 
