@@ -4,6 +4,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
+  UpdateDateColumn,
+  OneToOne,
 } from "typeorm";
 import type{ Patient } from "./patient.entities.js";
 import type{ Doctor } from "./doctor.entities.js";
@@ -14,24 +18,33 @@ export class MedicalRecord {
   @PrimaryGeneratedColumn("uuid")
   medical_record_id!: string;
 
-  @ManyToOne("Patient", "medical_records", { nullable: false })
+  @ManyToOne("Patient", "medical_records", { nullable: false, onDelete: "RESTRICT" })
   @JoinColumn({ name: "patient_id" })
   patient!: Patient;
 
-  @ManyToOne("Doctor", "medical_records", { nullable: false })
+  @ManyToOne("Doctor", "medical_records", { nullable: false, onDelete: "RESTRICT" })
   @JoinColumn({ name: "doctor_id" })
   doctor!: Doctor;
 
-  @ManyToOne("Appointment", { nullable: true })
+  @OneToOne("Appointment", { nullable: false, onDelete: "RESTRICT" })
   @JoinColumn({ name: "appointment_id" })
-  appointment?: Appointment;
+  appointment!: Appointment;
 
   @Column({ type: "text" })
   diagnosis!: string;
 
   @Column({ type: "text", nullable: true })
-  notes?: string;
+  notes!: string;
 
-  @Column({ type: "date" })
+  @Column({ type: "date", default: () => "CURRENT_DATE" })
   record_date!: Date;
+
+  @CreateDateColumn()
+  created_at!: Date;
+
+  @UpdateDateColumn()
+  updated_at!: Date;
+
+  @DeleteDateColumn()
+  deleted_at!: Date;
 }
