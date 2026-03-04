@@ -66,6 +66,32 @@ export class AppointmentRepository{
       return count > 0;
    };
 
+   async countAppointmentInSlot(
+      doctorId: string,
+      appointmentDate: string,
+      appointmentTime: string
+   ){
+      return await this.appointmentRepository.count({
+         where: {
+            doctor: { doctor_id: doctorId },
+            appointment_date: appointmentDate as any,
+            appointment_time: appointmentTime
+         }
+      });
+   };
+
+   async countAppointmentsForDoctorAndDate(
+      doctorId: string,
+      date: string
+   ) {
+      return await this.appointmentRepository.find({
+         where: {
+            doctor: { doctor_id: doctorId },
+            appointment_date: date as any
+         }
+      });
+   }
+
    async save(appointment: Appointment){ //kam to update ka hi karti hai...
       return await this.appointmentRepository.save(appointment)
    };

@@ -13,10 +13,10 @@ import type { Patient } from "./patient.entities.js";
 import type { Doctor } from "./doctor.entities.js";
 import type { AppointmentStatus } from "./appointment_status.entities.js";
 
-@Index(
-  ["doctor", "appointment_date", "appointment_time"],
-  { unique: true }
-)
+// @Index(
+//   ["doctor", "appointment_date", "appointment_time"],
+//   { unique: true }
+// )
 
 @Entity("appointment")
 export class Appointment {

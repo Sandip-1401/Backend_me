@@ -8,10 +8,12 @@ import appointmentRoute from "./modules/appointment/appointment.route";
 import { AppError } from "./common/errors/AppError";
 import medicalRecordRoute from "./modules/medical-record/medical_record.routes";
 import prescriptionRoute from "./modules/prescription/prescription.routes";
+import scheduleRoute from "./modules/doctor-scheduling/doctorScheduling.routes";
 
 const app = express();
 
 app.use(express.json());
+
 app.use("/api/auth", authRoute);
 app.use("/api/role", roleRoute);
 app.use("/api/user-roles", userRoleRoute);
@@ -20,7 +22,7 @@ app.use("/api/patients", patientRoute);
 app.use("/api/appointments", appointmentRoute)
 app.use("/api/medical-records", medicalRecordRoute);
 app.use("/api/prescriptions", prescriptionRoute);
-
+app.use("/api/schedule", scheduleRoute)
 
 app.get("/", (req, res) => {
    res.status(200).json({

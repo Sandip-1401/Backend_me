@@ -73,5 +73,30 @@ export class AppointmentController {
             message: error.message,
          });
       }
-   }
+   };
+
+   getAvailableSlots = async (req: AuthRequest, res: Response) => {
+      try {
+
+         const doctorId = req.params.id;
+         const date = req.query.date as string;
+
+         const slots =
+            await this.appointmentService.giveAvilableSlots(
+               String(doctorId),
+               date
+            );
+
+         return res.status(200).json({
+            success: true,
+            data: slots
+         });
+
+      } catch (error: any) {
+         return res.status(400).json({
+            success: false,
+            message: error.message
+         });
+      }
+   };
 }
