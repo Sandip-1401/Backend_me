@@ -16,13 +16,13 @@ export class PrescriptionMedicine {
   @JoinColumn({ name: "prescription_id" })
   prescription!: Prescription;
 
-  @Column({type: "timestamp"})
+  @Column({ type: "varchar", length: 255 })
   medicine_name!: string;
 
-  @Column({type: "timestamp"})
+  @Column({ type: "varchar", length: 100 })
   dosage!: string;
 
-  @Column({type: "timestamp"})
+  @Column({ type: "varchar", length: 100 })
   frequency!: string;
 
   @Column({ type: "int" })

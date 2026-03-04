@@ -7,6 +7,7 @@ import patientRoute from "./modules/patient/patient.route";
 import appointmentRoute from "./modules/appointment/appointment.route";
 import { AppError } from "./common/errors/AppError";
 import medicalRecordRoute from "./modules/medical-record/medical_record.routes";
+import prescriptionRoute from "./modules/prescription/prescription.routes";
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use("/api/doctors", doctorRoute);
 app.use("/api/patients", patientRoute);
 app.use("/api/appointments", appointmentRoute)
 app.use("/api/medical-records", medicalRecordRoute);
+app.use("/api/prescriptions", prescriptionRoute);
+
 
 app.get("/", (req, res) => {
    res.status(200).json({
