@@ -1,3 +1,4 @@
+import { AppError } from "../../common/errors/AppError";
 import { Role } from "../../entities/roles.entities";
 import RoleRepository from "./role.repository";
 
@@ -7,7 +8,7 @@ export class RoleService{
    async createRole(data: Partial<Role>){
       const existingRole = await this.roleRepository.findByName(data.role_name!);
       if(existingRole){
-         throw new Error("Role already exists");
+         throw new AppError("Role already exists", 409, "ROLE_ALREADY_EXISTS");
       }
       return this.roleRepository.createRole(data);
    }

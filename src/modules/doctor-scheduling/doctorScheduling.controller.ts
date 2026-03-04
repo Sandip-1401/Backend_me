@@ -7,7 +7,6 @@ export class DoctorSchedulingController {
    private schedulingService = new DoctorSchedulingService();
 
    createSchedule = async (req: AuthRequest, res: Response) => {
-      try {
 
          const doctorId = req.body.doctor_id;
 
@@ -26,18 +25,9 @@ export class DoctorSchedulingController {
             data: schedule
          });
 
-      } catch (error: any) {
-
-         return res.status(400).json({
-            success: false,
-            message: error.message
-         });
-
-      }
    };
 
    getDoctorSchedule = async (req: AuthRequest, res: Response) => {
-      try {
 
          const doctorId = req.params.doctorId;
 
@@ -49,18 +39,9 @@ export class DoctorSchedulingController {
             data: schedules
          });
 
-      } catch (error: any) {
-
-         return res.status(400).json({
-            success: false,
-            message: error.message
-         });
-
-      }
    };
 
    updateSchedule = async (req: AuthRequest, res: Response) => {
-      try {
 
          const scheduleId = req.params.id;
 
@@ -76,18 +57,9 @@ export class DoctorSchedulingController {
             data: updated
          });
 
-      } catch (error: any) {
-
-         return res.status(400).json({
-            success: false,
-            message: error.message
-         });
-
-      }
    };
 
    deleteSchedule = async (req: AuthRequest, res: Response) => {
-      try {
 
          const scheduleId = req.params.id;
 
@@ -98,14 +70,6 @@ export class DoctorSchedulingController {
             message: "Schedule deleted"
          });
 
-      } catch (error: any) {
-
-         return res.status(400).json({
-            success: false,
-            message: error.message
-         });
-
-      }
    };
 
 }

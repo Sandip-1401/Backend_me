@@ -3,6 +3,7 @@ import { PrescriptionRepository } from "./prescription.repository";
 import { AppDataSource } from "../../config/datasource";
 import { Prescription } from "../../entities/prescription.entities";
 import { PrescriptionMedicine } from "../../entities/prescription_medicine.entities";
+import { AppError } from "../../common/errors/AppError";
 
 export class PrescriptionService {
 
@@ -40,7 +41,7 @@ export class PrescriptionService {
       const prescription = await this.prescriptionRepository.findByMedicalRecord(medicalRecordId);
 
       if(!prescription){
-         throw new Error("Prescription not found");
+         throw new AppError("Prescription not found", 404, "PRESCRIPTION_NOT_FOUND");
       }
 
       return prescription;
@@ -52,7 +53,7 @@ export class PrescriptionService {
          await this.prescriptionRepository.findByPatient(patientId);
 
       if(!prescriptions || prescriptions.length === 0){
-         throw new Error("No prescriptions found for this patient");
+         throw new AppError("No prescriptions found for this patient", 404, "PATIENT_PRESCRIPTIONS_NOT_FOUND");
       }
 
       return prescriptions;
@@ -64,7 +65,7 @@ export class PrescriptionService {
          await this.prescriptionRepository.findById(prescriptionId);
 
       if(!prescription){
-         throw new Error("Prescription not found");
+         throw new AppError("Prescription not found", 404, "PRESCRIPTION_NOT_FOUND");
       }
 
       return prescription;

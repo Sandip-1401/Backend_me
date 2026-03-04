@@ -9,39 +9,25 @@ export class DoctorController {
 
    // POST for logged-in user
    createDoctor = async (req: AuthRequest, res: Response) => {
-      try {
-         const user_id = req.user!.user_id;
-         const doctor = await this.doctorService.createDoctor(user_id, req.body);
+      const user_id = req.user!.user_id;
+      const doctor = await this.doctorService.createDoctor(user_id, req.body);
 
-         return res.status(201).json({
-            success: true,
-            message: "Doctor created successfully",
-            data: doctor,
-         });
-      } catch (err: any) {
-         return res.status(400).json({
-            success: false,
-            message: err.message,
-         });
-      }
+      return res.status(201).json({
+         success: true,
+         message: "Doctor created successfully",
+         data: doctor,
+      });
    };
 
    // GET for own profile (logged-in doctor)
    getMyProfile = async (req: AuthRequest, res: Response) => {
-      try {
-         const user_id = req.user!.user_id;
-         const doctor = await this.doctorService.getDoctorByUserId(user_id);
+      const user_id = req.user!.user_id;
+      const doctor = await this.doctorService.getDoctorByUserId(user_id);
 
-         return res.status(200).json({
-            success: true,
-            data: doctor,
-         });
-      } catch (err: any) {
-         return res.status(404).json({
-            success: false,
-            message: err.message,
-         });
-      }
+      return res.status(200).json({
+         success: true,
+         data: doctor,
+      });
    };
 
    // GET /:id - Kisi bhi doctor ka profile dekho (admin / public)
@@ -54,58 +40,44 @@ export class DoctorController {
 
    // GET / - All doctors
    getAllDoctors = async (req: AuthRequest, res: Response) => {
-      try {
-         const doctors = await this.doctorService.getAllDoctors();
+      const doctors = await this.doctorService.getAllDoctors();
 
-         return res.status(200).json({
-            success: true,
-            data: doctors,
-         });
-      } catch (err: any) {
-         return res.status(500).json({
-            success: false,
-            message: err.message,
-         });
-      }
+      return res.status(200).json({
+         success: true,
+         data: doctors,
+      });
    };
 
    // PATCH /:id - Doctor update karo
    updateDoctor = async (req: AuthRequest, res: Response) => {
-      try {
-         const doctor_id = req.params.id;
+      const doctor_id = req.params.id;
 
-         const {
-            qualification,
-            experience_years,
-            consultation_fee,
-            is_available,
-            status,
-         } = req.body;
+      const {
+         qualification,
+         experience_years,
+         consultation_fee,
+         is_available,
+         status,
+      } = req.body;
 
-         const data = {
-            qualification,
-            experience_years,
-            consultation_fee,
-            is_available,
-            status,
-         };
+      const data = {
+         qualification,
+         experience_years,
+         consultation_fee,
+         is_available,
+         status,
+      };
 
-         await this.doctorService.updateDoctorById(String(doctor_id), data);
+      await this.doctorService.updateDoctorById(String(doctor_id), data);
 
-         return res.status(200).json({
-            success: true,
-            message: "Doctor updated successfully",
-         });
-      } catch (err: any) {
-         return res.status(400).json({
-            success: false,
-            message: err.message,
-         });
-      }
+      return res.status(200).json({
+         success: true,
+         message: "Doctor updated successfully",
+      });
    };
 
    deleteDoctor = async (req: AuthRequest, res: Response) => {
-      try{
+      try {
          const doctorId = req.params.id;
          await this.doctorService.deleteDoctor(String(doctorId));
 
@@ -113,7 +85,7 @@ export class DoctorController {
             success: true,
             message: "Doctor delete successfully",
          });
-      }catch(err: any){
+      } catch (err: any) {
          return res.status(400).json({
             success: false,
             message: err.message,

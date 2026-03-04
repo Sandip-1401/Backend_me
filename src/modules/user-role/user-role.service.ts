@@ -1,3 +1,4 @@
+import { AppError } from "../../common/errors/AppError";
 import { AppDataSource } from "../../config/datasource";
 import { Role } from "../../entities/roles.entities";
 import { User } from "../../entities/user.entities";
@@ -14,7 +15,7 @@ export class UserRoleService{
       });
 
       if(!user){
-         throw new Error("User not found");
+         throw new AppError("User not found", 404, "USER_NOT_FOUND");
       }
 
       const role = await this.roleRepository.findOne({
@@ -22,7 +23,7 @@ export class UserRoleService{
       });
 
       if(!role){
-         throw new Error("Role not found");
+         throw new AppError("Role not found", 404, "ROLE_NOT_FOUND");
       }
 
       const existingRole = await this.userRoleRepository.findByUserAndRole(user, role);
@@ -33,7 +34,7 @@ export class UserRoleService{
             existingRole.is_active = true,
             existingRole.updated_at = new Date();
          }
-         throw new Error("User already has this role");
+         throw new AppError("User already has this role", 409, "USER_ROLE_ALREADY_ASSIGNED");
       }
 
       let assignedBy: User | undefined;
@@ -44,7 +45,7 @@ export class UserRoleService{
          }) ?? undefined
 
          if (!assignedBy) {
-         throw new Error("AssignedBy user not found");
+         throw new AppError("AssignedBy user not found", 404, "ASSIGNED_BY_USER_NOT_FOUND");
       }
       }
 
@@ -57,7 +58,7 @@ export class UserRoleService{
       });
 
       if(!user1){
-         throw new Error("User not found");
+         throw new AppError("User not found", 404, "USER_NOT_FOUND");
       }
 
       const role1 = await this.roleRepository.findOne({
@@ -65,7 +66,7 @@ export class UserRoleService{
       });
 
       if(!role1){
-         throw new Error("Role not found");
+         throw new AppError("Role not found", 404, "ROLE_NOT_FOUND");
       }
 
       return await this.userRoleRepository.findByUserAndRole(user1, role1) 
@@ -77,7 +78,7 @@ export class UserRoleService{
       });
 
       if(!user){
-         throw new Error("User not found");
+         throw new AppError("User not found", 404, "USER_NOT_FOUND");
       }
 
       const role = await this.roleRepository.findOne({
@@ -85,13 +86,13 @@ export class UserRoleService{
       });
 
       if(!role){
-         throw new Error("Role not found");
+         throw new AppError("Role not found", 404, "ROLE_NOT_FOUND");
       }
 
       const userRole = await this.userRoleRepository.findByUserAndRole(user, role);
       
       if(!userRole){
-         throw new Error("User role not found");
+         throw new AppError("User role not found", 404, "USER_ROLE_NOT_FOUND");
       }
       return await this.userRoleRepository.deactiveUserRole(userRole);
 
@@ -102,7 +103,7 @@ export class UserRoleService{
          where: {user_id: userId}
       });
       if(!user){
-         throw new Error("User not found");
+         throw new AppError("User not found", 404, "USER_NOT_FOUND");
       }
       return await this.userRoleRepository.getAllRolesByUser(user);
    }

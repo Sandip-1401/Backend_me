@@ -1,3 +1,4 @@
+import { AppError } from "../../common/errors/AppError";
 import { DayOfWeek, DoctorScheduling } from "../../entities/doctor_scheduling.entities";
 import { SchedulingRepository } from "./doctorScheduling.repository";
 
@@ -8,15 +9,15 @@ export class DoctorSchedulingService {
    async createSchedule(data: Partial<DoctorScheduling>) {
 
       if (!data.doctor || !data.day_of_week) {
-         throw new Error("Doctor and day_of_week are required");
+         throw new AppError("Doctor and day_of_week are required", 400, "DOCTOR_AND_DAY_REQUIRED");
       }
 
       if (!data.start_time || !data.end_time) {
-         throw new Error("Start time and end time are required");
+         throw new AppError("Start time and end time are required", 400, "TIME_RANGE_REQUIRED");
       }
 
       if (data.start_time >= data.end_time) {
-         throw new Error("Start time must be before end time");
+         throw new AppError("Start time must be before end time", 400, "INVALID_TIME_RANGE");
       }
 
       const existingSchedule =
@@ -26,7 +27,7 @@ export class DoctorSchedulingService {
          );
 
       if (existingSchedule) {
-         throw new Error("Schedule already exists for this doctor on this day");
+         throw new AppError("Schedule already exists for this doctor on this day", 409, "SCHEDULE_ALREADY_EXISTS");
       }
 
       return await this.schedulingRepository.createSchedul(data);
@@ -40,7 +41,7 @@ export class DoctorSchedulingService {
 
       if (data.start_time && data.end_time) {
          if (data.start_time >= data.end_time) {
-            throw new Error("Start time must be before end time");
+            throw new AppError("Start time must be before end time", 400, "INVALID_TIME_RANGE");
          }
       }
 

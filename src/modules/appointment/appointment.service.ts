@@ -7,6 +7,7 @@ import { CreateAppointmentDto, UpdateAppointmentDto } from "./appointment.dto";
 import { AppointmentRepository } from "./appointment.repository";
 import { SchedulingRepository } from "../doctor-scheduling/doctorScheduling.repository";
 import { DayOfWeek } from "../../entities/doctor_scheduling.entities";
+import { AppError } from "../../common/errors/AppError";
 
 export class AppointmentService {
    private appointmentRepository = new AppointmentRepository();
@@ -20,32 +21,32 @@ export class AppointmentService {
       const patient = await this.patientRepository.findOne({
          where: { user: { user_id: userId } },
       })
-      if (!patient) throw new Error("Patient not found");
+      if (!patient) throw new AppError("Patient not found", 404, "PATIENT_NOT_FOUND");
 
       const doctor = await this.doctorRepository.findOne({
          where: { doctor_id: data.doctor_id },
       })
 
-      if (!doctor) throw new Error("Doctor not found");
+      if (!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
 
       const selectdDate = new Date(data.appointment_date);
 
       const appointmentDay = selectdDate
-         .toLocaleDateString("en-US", {weekday: "long"})
+         .toLocaleDateString("en-US", { weekday: "long" })
          .toUpperCase() as DayOfWeek
-         //selected date de uska day nikala...like 2026-03-4 -> WEDNESDAY
+      //selected date de uska day nikala...like 2026-03-4 -> WEDNESDAY
 
       const schedule = await this.schedulingRepository.findByDoctorAndDay(data.doctor_id, appointmentDay);
 
-      if(!schedule){
-         throw new Error("Doctor is not available on this day");
+      if (!schedule) {
+         throw new AppError("Doctor is not available on this day",400,"DOCTOR_NOT_AVAILABLE");
       }
 
-      if(
+      if (
          data.appointment_time < schedule.start_time ||
          data.appointment_time >= schedule.end_time //hmmm...doctor ka timing 9 se 12 ka ho and slot 30-30 minutes ke ho to ham 12 baje sloat start nahi kar sakte...isi liye >= end_time use kiya...
-      ){
-         throw new Error("Appointment time is outside doctor working hours");
+      ) {
+         throw new AppError("Appointment time is outside doctor working hours",400,"APPOINTMENT_OUTSIDE_WORKING_HOURS");
       }
       //ese samjo data.appointment_time -> selected by patient
       //yoo samjo ki doctor ka starting time 9 baje ka hai and patient 8 baje aa gaya to esa nahi chalega....fir doctor ka ending time 12 baje ka hai fir patient 1 baje ata hai...to wo v nahi chalega....done...!!
@@ -66,13 +67,13 @@ export class AppointmentService {
       //ab dekho...here comparison in minutes is easier than in hour and in hour there may be mistake...isi liye minutes me convert kiya...
 
       if (diff % schedule.slot_duration_minutes !== 0) {
-         throw new Error("Invalid appointment slot");
+         throw new AppError("Invalid appointment slot",400,"INVALID_APPOINTMENT_SLOT");
       }//diff = 570-540 = 30...we assumind slote_duration 30 minutes...diff % slot_duration_minutes = 30 % 30 = 0....if 0 then valid slot else throw error....like 9:00, 9:30, 10:00 are valid and 9:10, 10:12 are invalid....but according to slot_duration_minutes it can be 60 too...ok...got it...!!
 
       const today = new Date();
 
       if (selectdDate <= today) {
-         throw new Error("Appointment date must be in future")
+         throw new AppError("Appointment date must be in future",400,"INVALID_APPOINTMENT_DATE");
       }
 
       // const isSlotTaken = await this.appointmentRepository.isSlotTaken(
@@ -91,15 +92,17 @@ export class AppointmentService {
 
       const maxPatients = schedule.max_patients ?? 1;
 
-      if(slotCount >= maxPatients){
-         throw new Error("This appointment slot is full");
+      if (slotCount >= maxPatients) {
+         throw new AppError("This appointment slot is full",400,"APPOINTMENT_SLOT_FULL");
       }
 
       const bookedStatus = await this.appointmentStatusRepository.findOne({
          where: { status_name: AppointmentStatusName.BOOKED }
       });
 
-      if (!bookedStatus) throw new Error("Appointment status is missing")
+      if (!bookedStatus) {
+         throw new AppError("Appointment status is missing",500,"APPOINTMENT_STATUS_MISSING");
+      }
 
       return await this.appointmentRepository.createAppointment({
          patient,
@@ -111,7 +114,7 @@ export class AppointmentService {
       })
    };
 
-   async giveAvilableSlots(doctorId: string, date: string){
+   async giveAvilableSlots(doctorId: string, date: string) {
       const selectedDate = new Date(date);
 
       const appointmentDay = selectedDate
@@ -123,28 +126,28 @@ export class AppointmentService {
          appointmentDay
       );
       if (!schedule) {
-         throw new Error("Doctor is not available on this day");
+         throw new AppError("Doctor is not available on this day",400,"DOCTOR_NOT_AVAILABLE");
       }
 
       const appointments =
-      await this.appointmentRepository.countAppointmentsForDoctorAndDate(
-         doctorId,
-         date
-      );
+         await this.appointmentRepository.countAppointmentsForDoctorAndDate(
+            doctorId,
+            date
+         );
 
-      const [startHour, startMinute] = schedule.start_time.split(":").slice(0,2).map(Number);
-      const [endHour, endMinute] = schedule.end_time.split(":").slice(0,2).map(Number);
+      const [startHour, startMinute] = schedule.start_time.split(":").slice(0, 2).map(Number);
+      const [endHour, endMinute] = schedule.end_time.split(":").slice(0, 2).map(Number);
 
       let currentMinutes = startHour * 60 + startMinute;
       const endMinutes = endHour * 60 + endMinute;
 
       const slots: string[] = [];
 
-      while(currentMinutes < endMinutes){
-         const hour = Math.floor(currentMinutes/60)
+      while (currentMinutes < endMinutes) {
+         const hour = Math.floor(currentMinutes / 60)
             .toString()
             .padStart(2, "0");
-         
+
          const minutes = (currentMinutes % 60)
             .toString()
             .padStart(2, "0");
@@ -155,12 +158,12 @@ export class AppointmentService {
 
          const maxPatients = schedule.max_patients ?? 1;
 
-         if(slotCount < maxPatients){
+         if (slotCount < maxPatients) {
             slots.push(slotTime);
          }
 
          currentMinutes += schedule.slot_duration_minutes;
-      } 
+      }
 
       return slots;
    }
@@ -168,20 +171,22 @@ export class AppointmentService {
    async updateStatus(appointmentId: string, data: UpdateAppointmentDto, role: string) {
       const appointment = await this.appointmentRepository.findById(appointmentId);
 
-      if (!appointment) throw new Error("Appointment not found");
+      if (!appointment) {
+         throw new AppError( "Appointment not found", 404, "APPOINTMENT_NOT_FOUND");
+      }
 
       if (!data.status) return appointment;
 
       if (appointment.status.status_name === AppointmentStatusName.COMPLETED) {
-         throw new Error("Completed appointment can not modify")
+         throw new AppError( "Completed appointment cannot be modified", 400, "APPOINTMENT_ALREADY_COMPLETED");
       }
 
       if (role === "PATIENT" && data.status !== AppointmentStatusName.CANCELLED) {
-         throw new Error("Patient can only cancel appointment")
+         throw new AppError( "Patient can only cancel appointment", 403, "PATIENT_CANCEL_ONLY");
       }
 
       if (role === "DOCTOR" && data.status !== AppointmentStatusName.COMPLETED) {
-         throw new Error("Doctor can only complet appointment")
+         throw new AppError( "Doctor can only complete appointment", 403, "DOCTOR_COMPLETE_ONLY");
       }
 
       const newStatus = await this.appointmentStatusRepository.findOne({
@@ -190,7 +195,9 @@ export class AppointmentService {
          }
       });
 
-      if (!newStatus) throw new Error("Invalid status");
+      if (!newStatus) {
+         throw new AppError( "Invalid status", 400, "INVALID_APPOINTMENT_STATUS");
+      }
 
       appointment.status = newStatus;
 
@@ -204,8 +211,7 @@ export class AppointmentService {
 
       if (patient) {
          return await this.appointmentRepository.findBtPatientId(
-            patient.patient_id
-         );
+            patient.patient_id);
       }
 
       const doctor = await this.doctorRepository.findOne({
@@ -214,20 +220,19 @@ export class AppointmentService {
 
       if (doctor) {
          return await this.appointmentRepository.findByDoctorId(
-            doctor.doctor_id
-         );
+            doctor.doctor_id);
       }
 
-      throw new Error("User has no patient or doctor profile");
+      throw new AppError( "User has no patient or doctor profile", 404, "USER_PROFILE_NOT_FOUND");
    };
 
-   async getRoleByUserId(userId: string){
-      const roleRow =  await this.roleRepository.findOne({
-         where: {user: {user_id: userId}},
-         relations: {role: true}
+   async getRoleByUserId(userId: string) {
+      const roleRow = await this.roleRepository.findOne({
+         where: { user: { user_id: userId } },
+         relations: { role: true }
       });
       if (!roleRow) {
-         throw new Error("User role not found");
+         throw new AppError( "User role not found", 404, "ROLE_NOT_FOUND");
       }
 
       return roleRow?.role.role_name;

@@ -9,6 +9,7 @@ import { AppError } from "./common/errors/AppError";
 import medicalRecordRoute from "./modules/medical-record/medical_record.routes";
 import prescriptionRoute from "./modules/prescription/prescription.routes";
 import scheduleRoute from "./modules/doctor-scheduling/doctorScheduling.routes";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.get("/", (req, res) => {
       message: "Backend is running on 5152...!!"
    })
 })
+
+app.use(errorMiddleware);
 
 app.use((err: any, req: any, res: any, next: any) => {
    if(err instanceof AppError){

@@ -1,3 +1,4 @@
+import { AppError } from "../../common/errors/AppError";
 import { AppDataSource } from "../../config/datasource";
 import { Role } from "../../entities/roles.entities";
 import { User } from "../../entities/user.entities";
@@ -20,13 +21,13 @@ export class PatientService{
       })
       
       if(!user){
-         throw new Error("User not found")
+         throw new AppError("User not found", 404, "USER_NOT_FOUND");
       }
 
       const existsPatient = await this.patientRepository.findByUserId(data.user_id);
 
       if(existsPatient){
-         throw new Error("Patient already exists")
+         throw new AppError("Patient already exists", 409, "PATIENT_ALREADY_EXISTS");
       }
 
       const patient = await this.patientRepository.createPatient(data);
@@ -36,7 +37,7 @@ export class PatientService{
       });
 
       if(!patientRole){ 
-         throw new Error("Patient role not found")
+         throw new AppError("Patient role not found", 404, "PATIENT_ROLE_NOT_FOUND");
       }
 
       await this.userRoleRepository.assignRole(user, patientRole);
@@ -47,7 +48,7 @@ export class PatientService{
    async findPatientById(patientId: string){
       const patient = await this.patientRepository.findById(patientId);
       if(!patient){
-         throw new Error("Patient not found")
+         throw new AppError("Patient not found", 404, "PATIENT_NOT_FOUND");
       }
       return patient;
    };
@@ -59,7 +60,7 @@ export class PatientService{
    async findPatientByUserId(userId: string){
       const patient = await this.patientRepository.findByUserId(userId)
       if(!patient){
-         throw new Error("Patient not found")
+         throw new AppError("Patient not found", 404, "PATIENT_NOT_FOUND");
       }
       return patient;
    };
@@ -68,7 +69,7 @@ export class PatientService{
       const patient = await this.patientRepository.updatePatient(patientId, data);
 
       if(patient.affected === 0){
-         throw new Error("Patient not found or not updated")
+         throw new AppError("Patient not found or not updated", 404, "PATIENT_UPDATE_FAILED");
       }
       return true;
    };
@@ -77,7 +78,7 @@ export class PatientService{
       const result = await this.patientRepository.deletePatient(patientId);
 
       if (!result.affected) {
-         throw new Error("Patient not found");
+         throw new AppError("Patient not found", 404, "PATIENT_NOT_FOUND");
       }
 
       return true;

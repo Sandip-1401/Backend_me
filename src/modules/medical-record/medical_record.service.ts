@@ -1,3 +1,4 @@
+import { AppError } from "../../common/errors/AppError";
 import { CreateMedicalRecordDto } from "./dto/createMedicalRecordDto";
 import { MedicalRecordRepository } from "./medical-record.repository";
 
@@ -7,7 +8,7 @@ export class MedicalRecordService{
    async createRecord(data: CreateMedicalRecordDto){
       const existingRecord = await this.medicalRecordRepository.findByAppointment(data.appointment_id);
 
-      if(existingRecord) throw new Error("Medical Record already exists for this Appointment");
+      if (existingRecord) throw new AppError("Medical record already exists for this appointment", 409, "MEDICAL_RECORD_ALREADY_EXISTS");
 
       const record = await this.medicalRecordRepository.createRecord({
          patient: {patient_id: data.patient_id} as any,
@@ -21,20 +22,20 @@ export class MedicalRecordService{
 
    async getAppointmentRecord(appointmentId: string){
       const record = await this.medicalRecordRepository.findByAppointment(appointmentId);
-      if(!record) throw new Error("No recors found for this appointment")
+      if (!record) throw new AppError("No records found for this appointment", 404, "MEDICAL_RECORD_NOT_FOUND");
       return record;
    }
 
    async getPatientRecords(patientId: string){
       const record = await this.medicalRecordRepository.findByPatient(patientId);
-      if(!record ||record.length === 0) throw new Error("No recors found for this Patient");
+      if (!record || record.length === 0) throw new AppError("No records found for this patient", 404, "PATIENT_MEDICAL_RECORDS_NOT_FOUND");
 
       return record;
    };
 
    async getDoctorRecords(doctorId: string){
       const record = await this.medicalRecordRepository.findByDoctor(doctorId);
-      if(!record || record.length === 0) throw new Error("no records found fot this doctor");
+      if (!record || record.length === 0) throw new AppError("No records found for this doctor", 404, "DOCTOR_MEDICAL_RECORDS_NOT_FOUND");
       return record;
    };
 

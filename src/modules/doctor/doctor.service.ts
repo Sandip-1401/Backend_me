@@ -40,17 +40,17 @@ export class DoctorService {
    ) {
       
       const user = await this.userRepository.findOne({ where: { user_id } });
-      if (!user) throw new Error("User not found");
+      if (!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
       
       const existingDoctor = await this.doctorRepository.findByUserId(user_id);
-      if (existingDoctor) throw new Error("Doctor already exists");
+      if (existingDoctor) throw new AppError("Doctor already exists", 409, "DOCTOR_ALREADY_EXISTS");
 
       
       const department = await this.departmentRepository.findOne({
          where: { department_id: payload.department_id },
       });
-      if (!department) throw new Error("Department not found");
+      if (!department) throw new AppError("Department not found", 404, "DEPARTMENT_NOT_FOUND");
 
       
       let address: Address | null = null;
@@ -58,7 +58,7 @@ export class DoctorService {
          address = await this.addressRepository.findOne({
             where: { address_id: payload.address_id },
          });
-         if (!address) throw new Error("Address not found");
+         if (!address) throw new AppError("Address not found", 404, "ADDRESS_NOT_FOUND");
       }
 
       const doctorData: Partial<Doctor> = {
@@ -78,7 +78,7 @@ export class DoctorService {
          where: {role_name: "DOCTOR"}
       });
 
-      if(!doctorRole) throw new Error("Doctor role not found");
+      if (!doctorRole) throw new AppError("Doctor role not found", 404, "DOCTOR_ROLE_NOT_FOUND");
 
       const saved = await this.userRoleRepository.assignRole(user, doctorRole);
       console.log("Saved userRole:", saved);       
@@ -88,14 +88,13 @@ export class DoctorService {
    
    async getDoctorByUserId(userId: string) {
       const doctor = await this.doctorRepository.findByUserId(userId);
-      if (!doctor) throw new Error("Doctor profile not found");
+      if (!doctor) throw new AppError("Doctor profile not found", 404, "DOCTOR_PROFILE_NOT_FOUND");
       return doctor;
    }
 
    
    async getDoctorById(doctorId: string) {
       const doctor = await this.doctorRepository.findByDoctorId(doctorId);
-      // if (!doctor) throw new Error("Doctor not found");
       if(!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
       return doctor;
    }
@@ -107,7 +106,7 @@ export class DoctorService {
    async updateDoctorById(doctorId: string, data: Partial<Doctor>) {
       
       const doctor = await this.doctorRepository.findByDoctorId(doctorId);
-      if (!doctor) throw new Error("Doctor not found");
+      if (!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
 
       const filteredData = Object.fromEntries(
          Object.entries(data).filter(([key]) =>
@@ -116,7 +115,7 @@ export class DoctorService {
       ) as Partial<AllowedUpdateData>;
 
       if (Object.keys(filteredData).length === 0) {
-         throw new Error("No valid fields provided to update");
+         throw new AppError("No valid fields provided to update", 400, "NO_UPDATE_FIELDS");
       }
 
       const result = await this.doctorRepository.updateDoctor(
@@ -124,7 +123,7 @@ export class DoctorService {
          filteredData
       );
 
-      if (result.affected === 0) throw new Error("Update failed");
+      if (result.affected === 0) throw new AppError("Update failed", 500, "DOCTOR_UPDATE_FAILED");
 
       return result;
    };
@@ -133,7 +132,7 @@ export class DoctorService {
    async deleteDoctor(doctorId: string){
       const doctor = await this.doctorRepository.findByDoctorId(doctorId);
       if(!doctor){
-         throw new Error("Doctor not found")
+         throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
       }
       return await this.doctorRepository.deleteDoctor(doctorId);
    }
