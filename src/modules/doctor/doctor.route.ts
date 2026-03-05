@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { DoctorController } from "./doctor.controller";
 import { authMiddleware } from "../../middlewares/auth.middleware";
+import { validate } from "../../middlewares/validate.middleware";
+import { createDoctorSchema, updateDoctorSchema } from "./doctor.validation";
 
 const doctorRoute = Router();
 const doctorController = new DoctorController();
@@ -8,8 +10,8 @@ const doctorController = new DoctorController();
 doctorRoute.get("/", authMiddleware, doctorController.getAllDoctors);
 doctorRoute.get("/my-profile", authMiddleware, doctorController.getMyProfile);
 doctorRoute.get("/:id", authMiddleware, doctorController.getDoctorById);
-doctorRoute.post("/", authMiddleware, doctorController.createDoctor);
-doctorRoute.patch("/:id", authMiddleware, doctorController.updateDoctor);
+doctorRoute.post("/", authMiddleware, validate(createDoctorSchema), doctorController.createDoctor);
+doctorRoute.patch("/:id", authMiddleware, validate(updateDoctorSchema), doctorController.updateDoctor);
 doctorRoute.delete("/:id", authMiddleware, doctorController.deleteDoctor);
 
 export default doctorRoute;

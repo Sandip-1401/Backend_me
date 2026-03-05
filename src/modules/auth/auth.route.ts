@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { login, refreshToken, register, logout } from "./auth.controller";
 import { authMiddleware } from "../../middlewares/auth.middleware";
+import { validate } from "../../middlewares/validate.middleware";
+import { loginSchema, registerSchema } from "./auth.validation";
 
 const authRoute = Router();
 
-authRoute.post("/login", login);
-authRoute.post("/register", register); 
+authRoute.post("/login", validate(loginSchema), login);
+authRoute.post("/register", validate(registerSchema), register); 
 authRoute.post("/refresh-token", refreshToken);
 authRoute.post("/logout", logout);
 

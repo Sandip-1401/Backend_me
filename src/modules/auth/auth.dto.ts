@@ -1,11 +1,11 @@
 export interface LoginDto{
    email: string,
-   password: string
+   passward: string
 }
 
 export interface RegisterDto{
    name: string,
    email: string,
-   password: string,
+   passward: string,
    phone_no?: string
 }

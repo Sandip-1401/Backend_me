@@ -7,7 +7,8 @@
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.18.0",
     "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "zod": "^4.3.6"
   },
   "name": "backend",
   "version": "1.0.0",
