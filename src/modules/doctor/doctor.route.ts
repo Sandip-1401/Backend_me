@@ -8,7 +8,7 @@ import { asyncHandler } from "../../common/utils/asyncHandler";
 const doctorRoute = Router();
 const doctorController = new DoctorController();
 
-doctorRoute.get("/", authMiddleware, asyncHandler(doctorController.getAllDoctors));
+doctorRoute.get("/", authMiddleware, (doctorController.getAllDoctors));
 doctorRoute.get("/my-profile", authMiddleware, asyncHandler(doctorController.getMyProfile));
 doctorRoute.get("/:id", authMiddleware, doctorController.getDoctorById);
 doctorRoute.post("/", authMiddleware, validate(createDoctorSchema), asyncHandler(doctorController.createDoctor));

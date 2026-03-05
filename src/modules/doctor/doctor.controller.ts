@@ -40,7 +40,8 @@ export class DoctorController {
 
    // GET / - All doctors
    getAllDoctors = async (req: AuthRequest, res: Response) => {
-      const doctors = await this.doctorService.getAllDoctors();
+      
+      const doctors = await this.doctorService.getAllDoctors(req.query);
 
       return res.status(200).json({
          success: true,

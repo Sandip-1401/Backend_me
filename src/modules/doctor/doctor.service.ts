@@ -8,7 +8,8 @@ import { User } from "../../entities/user.entities";
 import { UserRole } from "../../entities/user_role.entities";
 import UserRoleRepository from "../user-role/user_role.repository";
 import { DoctorRepository } from "./doctor.repository";
-
+import { getPagination } from "../../utils/pagination.util";
+import { buildPagination } from "../../utils/pagination-response.util";
 
 const ALLOWED_UPDATE_FIELDS = [
    "qualification",
@@ -99,9 +100,23 @@ export class DoctorService {
       return doctor;
    }
 
-   async getAllDoctors() {
-      return await this.doctorRepository.findAllDoctors();
-   }
+      async getAllDoctors(query: any) {
+
+         const {page, limit, skip} = getPagination(query);//pagination
+
+         const departmentId = query.department_id as string | undefined;//filtering
+
+         const sort = query.sort as string | undefined;//sorting
+         const order = (query.order as "ASC" | "DESC") || "ASC";
+
+         const search = query.search as string | undefined; //searching
+
+         const [doctor, total] =  await this.doctorRepository.findAllDoctors(skip, limit, departmentId, sort, order, search);
+
+         console.log(query);
+
+         return buildPagination(doctor, total, page, limit)
+      }
 
    async updateDoctorById(doctorId: string, data: Partial<Doctor>) {
       
