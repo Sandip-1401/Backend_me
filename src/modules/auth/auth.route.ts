@@ -3,13 +3,14 @@ import { login, refreshToken, register, logout } from "./auth.controller";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { validate } from "../../middlewares/validate.middleware";
 import { loginSchema, registerSchema } from "./auth.validation";
+import { asyncHandler } from "../../common/utils/asyncHandler";
 
 const authRoute = Router();
 
-authRoute.post("/login", validate(loginSchema), login);
-authRoute.post("/register", validate(registerSchema), register); 
-authRoute.post("/refresh-token", refreshToken);
-authRoute.post("/logout", logout);
+authRoute.post("/login", validate(loginSchema), asyncHandler(login));
+authRoute.post("/register", validate(registerSchema), asyncHandler(register)); 
+authRoute.post("/refresh-token", asyncHandler(refreshToken));
+authRoute.post("/logout", asyncHandler(logout));
 
 authRoute.get("/test", authMiddleware, (req, res) => {
   res.status(200).json({
