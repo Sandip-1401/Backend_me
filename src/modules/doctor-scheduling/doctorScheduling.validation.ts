@@ -7,8 +7,8 @@ export const createDoctorScheduleSchema = z.object({
   doctor_id: z.string().uuid(),
   day_of_week: z.nativeEnum(DayOfWeek),
 
-  start_time: z.string().regex(timeRegex, "Invalid time format"),
-  end_time: z.string().regex(timeRegex, "Invalid time format"),
+  start_time: z.string(),//.regex(timeRegex, "Invalid time format"),
+  end_time: z.string(),//.regex(timeRegex, "Invalid time format"),
 
   slot_duration_minutes: z.number().min(1),
 
@@ -18,8 +18,8 @@ export const createDoctorScheduleSchema = z.object({
 export const updateDoctorScheduleSchema = z.object({
   day_of_week: z.nativeEnum(DayOfWeek).optional(),
 
-  start_time: z.string().regex(timeRegex, "Invalid time format"),
-  end_time: z.string().regex(timeRegex, "Invalid time format"),
+  start_time: z.string(),//.regex(timeRegex, "Invalid time format"),
+  end_time: z.string(),//.regex(timeRegex, "Invalid time format"),
 
   slot_duration_minutes: z.number().min(1).optional(),
 

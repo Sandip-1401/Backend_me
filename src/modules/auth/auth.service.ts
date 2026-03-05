@@ -16,7 +16,7 @@ export class AuthService {
          throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
       }
 
-      const isMatch = await bcrypt.compare(dto.password, user.password_hash);
+      const isMatch = await bcrypt.compare(dto.passward, user.password_hash);
 
       if (!isMatch) {
          throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
@@ -58,7 +58,7 @@ export class AuthService {
          throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
       }
 
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
+      const hashedPassword = await bcrypt.hash(dto.passward, 10);
 
       const user = await this.authRepository.createUser({
          name: dto.name,
