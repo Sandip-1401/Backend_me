@@ -33,18 +33,5 @@ app.get("/", (req, res) => {
 
 app.use(errorMiddleware);
 
-app.use((err: any, req: any, res: any, next: any) => {
-   if(err instanceof AppError){
-      return res.status(err.statusCode).json({
-         success: false,
-         message: err.message,
-         errorCode: err.errorCode
-      });
-   }
-   return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-   });
-})
 
 export default app;

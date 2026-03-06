@@ -20,7 +20,8 @@ export class PatientCntroller {
    };
 
    getAll = async (req: AuthRequest, res: Response) => {
-      const patients = await this.patientService.findAllPatient();
+
+      const patients = await this.patientService.findAllPatient(req.query);
 
       return res.status(200).json({
          success: true,

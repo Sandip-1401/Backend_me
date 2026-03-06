@@ -26,7 +26,15 @@ export class DoctorRepository {
       });
    }
 
-   async findAllDoctors(skip: number, limit: number, departmentId?: string, sort?: string, order: "ASC" | "DESC" = "ASC", search?: string): Promise<[Doctor[], number]>  {
+   async findAllDoctors(
+      skip: number,
+      limit: number,
+      departmentId?: string,
+      sort?: string,
+      order: "ASC" | "DESC" = "ASC",
+      search?: string
+
+   ): Promise<[Doctor[], number]> {
 
       const query = this.doctorRepository
          .createQueryBuilder("doctor")
@@ -41,14 +49,23 @@ export class DoctorRepository {
       }
 
       if (search) {
-         query.andWhere("doctor.qualification ILIKE :search", {
-            search: `%${search}%`
-         });
+         query.andWhere(
+            "(user.name ILIKE :search OR doctor.qualification ILIKE :search)",
+            { search: `%${search}%` }
+         );
       }
 
-      if (sort) {
+      const allowedSortFields = ["experience_years", "created_at"];
+
+      if (sort && allowedSortFields.includes(sort)) { 
          query.orderBy(`doctor.${sort}`, order);
+      }//sort=qualification;DROP TABLE doctor koi esa v bhej sakta hai...to SQL injection se bach ne ke liye...
+      else{
+         query.orderBy("doctor.created_at", "DESC");
       }
+
+      query.distinct(true);
+      //Important when using joins...kyuki agar doc1 -> dep1 and dep2 dono me hai...to vo do var ayega...at the end ham to doctor hi fetch kar rahe hai...deparment se koi lenedene nahi hai...
 
       query.skip(skip).take(limit);
 

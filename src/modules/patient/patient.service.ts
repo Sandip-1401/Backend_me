@@ -3,6 +3,8 @@ import { AppDataSource } from "../../config/datasource";
 import { Role } from "../../entities/roles.entities";
 import { User } from "../../entities/user.entities";
 import { UserRole } from "../../entities/user_role.entities";
+import { buildPagination } from "../../utils/pagination-response.util";
+import { getPagination } from "../../utils/pagination.util";
 import UserRoleRepository from "../user-role/user_role.repository";
 import { CreatePatientDto } from "./dto/createPatientDto";
 import { UpdatePatientDto } from "./dto/updatePatientDto";
@@ -53,8 +55,19 @@ export class PatientService{
       return patient;
    };
 
-   async findAllPatient(){
-      return this.patientRepository.findAllPatient();
+   async findAllPatient(query: any){
+
+      const {page, limit, skip} = getPagination(query);
+
+      const sort = query.sort as string | undefined;
+      const order = (query.order as "ASC" | "DESC") || "ASC";
+
+      const search = query.search as string | undefined;
+
+      const [patient, total] = await this.patientRepository.findAllPatient(skip, limit, sort, order, search);
+
+      return buildPagination(patient, total, page, limit);
+
    };
 
    async findPatientByUserId(userId: string){

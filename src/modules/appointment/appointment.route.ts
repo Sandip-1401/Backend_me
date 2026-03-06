@@ -9,6 +9,8 @@ const appointmentRoute = Router();
 
 const appointmentController = new AppointmentController();
 
+appointmentRoute.get("/", authMiddleware, asyncHandler(appointmentController.getAll))
+
 appointmentRoute.post("/", authMiddleware, validate(createAppointmentSchema), asyncHandler(appointmentController.createAppointment));
 
 appointmentRoute.get("/myappointment",authMiddleware, asyncHandler(appointmentController.getMyAppointments));

@@ -1,3 +1,4 @@
+import { applyFilter, applyPagination, applySearch, applySorting } from "../../common/utils/FSSP/fssp.util";
 import { AppDataSource } from "../../config/datasource";
 import { Appointment } from "../../entities/appointment.entities";
 import { UserRole } from "../../entities/user_role.entities";
@@ -54,17 +55,57 @@ export class AppointmentRepository{
       })
    };
 
-   async isSlotTaken(doctorId: string, appointmentDate: string, appointmentTime: string){
-      const count = await this.appointmentRepository.count({
-         where: {
-            doctor: {doctor_id: doctorId},
-            appointment_date: appointmentDate as any,
-            appointment_time: appointmentTime
-         }
-      });
+   async findAll(
+      skip: number,
+      limit: number,
+      statusId?: string,
+      sort?: string,
+      order: "ASC" | "DESC" = "ASC",
+      search?: string
+   ): Promise<[Appointment[], number]>{
 
-      return count > 0;
-   };
+      const query = this.appointmentRepository
+         .createQueryBuilder("appointment")
+         .leftJoinAndSelect("appointment.status", "status")
+         .leftJoinAndSelect("appointment.patient", "patient")
+         .leftJoinAndSelect("appointment.doctor", "doctor")
+
+      applyFilter(query, "status.appointment_status_id", statusId);
+      applySearch(query, ["appointment.reason"], search)
+
+      const allowedSortFields = ["appointment_date", "appointment_time", "created_at"];
+
+      applySorting(query, "appointment", sort, order, allowedSortFields);
+      applyPagination(query, skip, limit);
+
+
+
+      // const searchValue = search?.replace(/\s/g, "");//user search se space remove kiya...
+
+      // if(search){
+      //    query.andWhere(
+      //       "REPLACE(appointment.reason, ' ','') ILIKE :search ",
+      //       {search: `%${searchValue}%`}
+      //    );
+      // }//REPLACE(string, old_value, new_value) -> db me v sare season me se space remove
+
+      // const allowedSortFields = ["appointment_date", "appointment_time", "created_at"];
+
+      // if(sort && allowedSortFields.includes(sort)){
+      //    query.orderBy(`appointment.${sort}`, order);
+      // }else{
+      //    query.orderBy(`appointment.created_at`, "DESC");
+      // }
+
+      // query.distinct(true);
+
+      // query.skip(skip).take(limit);
+
+      const [appointment, total] = await query.getManyAndCount();
+
+      return [appointment, total];
+   }
+   
 
    async countAppointmentInSlot(
       doctorId: string,

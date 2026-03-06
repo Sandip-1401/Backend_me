@@ -31,10 +31,45 @@ export class PatientRepository{
       })
    }
 
-   async findAllPatient(){
-      return this.patientRepository.find({
-         relations: ["user", "address"]
-      });
+   async findAllPatient(
+      skip: number,
+      limit: number,
+      sort?: string,
+      order: "ASC" | "DESC" = "ASC",
+      search?: string
+   ): Promise<[Patient[], number]>{
+
+      const query = this.patientRepository
+         .createQueryBuilder("patient")
+         .leftJoinAndSelect("patient.user", "user")
+         .leftJoinAndSelect("patient.address", "address")
+
+      if(search){
+         query.andWhere(
+            `(
+               user.name ILIKE :search
+               OR user.email ILIKE :search
+               OR user.phone_number ILIKE :search
+            )`,
+            { search: `%${search}%` }
+         );
+      }
+
+      const allowedSortFields = ["date_of_birth", "height", "weight", "created_at"]
+
+      if(sort && allowedSortFields.includes(sort)){
+         query.orderBy(`patient.${sort}`, order)
+      }else{
+         query.orderBy("patient.created_at", "DESC");
+      }
+
+      query.distinct(true);
+
+      query.skip(skip).take(limit);
+
+      const [patients, total] = await query.getManyAndCount();
+
+      return [patients, total];
    }
 
    async findByUserId(userId: string){

@@ -54,6 +54,15 @@ export class AppointmentController {
       });
    };
 
+   getAll = async (req: AuthRequest, res: Response) => {
+      const appointments = await this.appointmentService.getAllAppointments(req.query);
+      
+      return res.status(200).json({
+         success: true,
+         data: appointments
+      });
+   }
+
    getAvailableSlots = async (req: AuthRequest, res: Response) => {
 
       const doctorId = req.params.id;
