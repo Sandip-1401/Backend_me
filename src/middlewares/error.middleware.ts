@@ -15,9 +15,11 @@ export const errorMiddleware = (
       code: err.errorCode
     });
   }
-console.error(err);
+  
+  console.error("Unhandled Error:", err);
+
   return res.status(500).json({
     success: false,
-    message: "Internal Server Error"
+    message: err.message || "Internal server Error"
   });
 };

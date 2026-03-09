@@ -88,7 +88,6 @@ export class DoctorService {
       if (!doctorRole) throw new AppError("Doctor role not found", 404, "DOCTOR_ROLE_NOT_FOUND");
 
       const saved = await this.userRoleRepository.assignRole(user, doctorRole);
-      console.log("Saved userRole:", saved);
 
       return doctor;
    }
@@ -119,8 +118,6 @@ export class DoctorService {
 
       const [doctor, total] = await this.doctorRepository.findAllDoctors(skip, limit, departmentId, sort, order, search);
 
-      console.log(query);
-
       return buildPagination(doctor, total, page, limit)
    }
 
@@ -142,8 +139,6 @@ export class DoctorService {
          relations: {doctor: true, patient: true, status: true}
       });
       if(!appointment) throw new AppError("Appointment not found", 404,"APPOINTMENT_NOT_FOUND");
-
-      console.log("status name",appointment.status.status_name);
 
       if(appointment.status.status_name !== AppointmentStatusName.BOOKED){
          throw new AppError("Only booked appointments can be approved",400,"INVALID_STATUS");

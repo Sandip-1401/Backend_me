@@ -12,7 +12,7 @@ export class DoctorSchedulingService {
    async createSchedule(data: Partial<DoctorScheduling>) {
       
       const doctorId = data.doctor?.doctor_id
-      console.log("DOCTOR ID",doctorId);
+
       const doctor = await this.doctorRepository.findByDoctorId(String(doctorId));
 
       if(doctor?.status !== DoctorStatus.ACTIVE){

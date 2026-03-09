@@ -8,7 +8,7 @@ export const requireRole = (roleName: string) => {
    return async (req: AuthRequest, res: Response, next: NextFunction) => {
 
       const userId = req.user?.user_id;
-      console.log(userId)
+      
       if (!userId) {
          throw new AppError("Unauthorized",401,"UNAUTHORIZED");
       }
