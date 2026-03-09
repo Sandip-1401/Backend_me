@@ -15,19 +15,31 @@
   "description": "",
   "main": "index.js",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "eslint": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "migration:generate": "typeorm-ts-node-esm migration:generate -d src/config/datasource.ts",
     "migration:run": "typeorm-ts-node-esm migration:run -d src/config/datasource.ts",
-    "migration:revert": "typeorm-ts-node-esm migration:revert -d src/config/datasource.ts"
+    "migration:revert": "typeorm-ts-node-esm migration:revert -d src/config/datasource.ts",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write src"
   },
   "keywords": [],
   "author": "",

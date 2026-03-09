@@ -1,25 +1,19 @@
-import { Request, Response, NextFunction } from "express";
-import { AppError } from "../common/errors/AppError";
+import { Request, Response, NextFunction } from 'express';
+import { AppError } from '../common/errors/AppError';
 
-export const errorMiddleware = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-
+export const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       success: false,
       message: err.message,
-      code: err.errorCode
+      code: err.errorCode,
     });
   }
-  
-  console.error("Unhandled Error:", err);
+
+  console.error('Unhandled Error:', err);
 
   return res.status(500).json({
     success: false,
-    message: err.message || "Internal server Error"
+    message: err.message || 'Internal server Error',
   });
 };

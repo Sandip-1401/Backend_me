@@ -1,129 +1,112 @@
-import { AppError } from "../../common/errors/AppError";
-import { AppDataSource } from "../../config/datasource";
-import { RefreshToken } from "../../entities/refresh_token.entity";
-import RoleRepository from "../role/role.repository";
-import UserRoleRepository from "../user-role/user_role.repository";
-import { LoginDto, RegisterDto } from "./auth.dto";
-import { AuthRepository } from "./auth.repository";
-import bcrypt from "bcrypt";
-import Jwt from "jsonwebtoken";
+import { AppError } from '../../common/errors/AppError';
+import { AppDataSource } from '../../config/datasource';
+import { RefreshToken } from '../../entities/refresh_token.entity';
+import RoleRepository from '../role/role.repository';
+import UserRoleRepository from '../user-role/user_role.repository';
+import { LoginDto, RegisterDto } from './auth.dto';
+import { AuthRepository } from './auth.repository';
+import bcrypt from 'bcrypt';
+import Jwt from 'jsonwebtoken';
 
 export class AuthService {
-   private authRepository = new AuthRepository();
-   private roleRepository = new RoleRepository();
-   private userRoleRepository = new UserRoleRepository();
-   private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+  private authRepository = new AuthRepository();
+  private roleRepository = new RoleRepository();
+  private userRoleRepository = new UserRoleRepository();
+  private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
 
-   async login(dto: LoginDto) {
-      const user = await this.authRepository.findByEmail(dto.email);
-      if (!user) {
-         throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
-      }
+  async login(dto: LoginDto) {
+    const user = await this.authRepository.findByEmail(dto.email);
+    if (!user) {
+      throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+    }
 
-      const isMatch = await bcrypt.compare(dto.passward, user.password_hash);
+    const isMatch = await bcrypt.compare(dto.passward, user.password_hash);
 
-      if (!isMatch) {
-         throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
-      }
+    if (!isMatch) {
+      throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+    }
 
-      const secretKey = process.env.JWT_SECRET_KEY;
+    const secretKey = process.env.JWT_SECRET_KEY;
 
-      if (!secretKey) {
-         throw new AppError("JWT_SECRET_KEY not defined", 500, "JWT_SECRET_NOT_DEFINED");
-      }
+    if (!secretKey) {
+      throw new AppError('JWT_SECRET_KEY not defined', 500, 'JWT_SECRET_NOT_DEFINED');
+    }
 
-      const accessToken = Jwt.sign(
-         { user_id: user.user_id },
-         secretKey,
-         { expiresIn: "15m" }
-      );
+    const accessToken = Jwt.sign({ user_id: user.user_id }, secretKey, { expiresIn: '15m' });
 
-      const refreshToken = Jwt.sign(
-         { user_id: user.user_id },
-         process.env.JWT_REFRESH_SECRET!,
-         { expiresIn: "7d" }
-      )
+    const refreshToken = Jwt.sign({ user_id: user.user_id }, process.env.JWT_REFRESH_SECRET!, {
+      expiresIn: '7d',
+    });
 
-      const refreshTokenEntity = this.refreshTokenRepository.create({
-         token: refreshToken,
-         user: user,
-         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      });
+    const refreshTokenEntity = this.refreshTokenRepository.create({
+      token: refreshToken,
+      user: user,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
 
-      await this.refreshTokenRepository.save(refreshTokenEntity);
+    await this.refreshTokenRepository.save(refreshTokenEntity);
 
-      return { user, accessToken, refreshToken };
-   }
+    return { user, accessToken, refreshToken };
+  }
 
-   async register(dto: RegisterDto) {
-      const existingUser = await this.authRepository.findByEmail(dto.email);
-      if (existingUser) {
+  async register(dto: RegisterDto) {
+    const existingUser = await this.authRepository.findByEmail(dto.email);
+    if (existingUser) {
+      throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+    }
 
-         throw new AppError("Invalid email or password", 401, "INVALID_CREDENTIALS");
-      }
+    const hashedPassword = await bcrypt.hash(dto.passward, 10);
 
-      const hashedPassword = await bcrypt.hash(dto.passward, 10);
+    const user = await this.authRepository.createUser({
+      name: dto.name,
+      email: dto.email,
+      password_hash: hashedPassword,
+      phone_number: dto.phone_number,
+    });
+    return user;
+  }
 
-      const user = await this.authRepository.createUser({
-         name: dto.name,
-         email: dto.email,
-         password_hash: hashedPassword,
-         phone_number: dto.phone_number
-      })
-      return user;
-   };
+  async refreshAccessToken(refreshToken: string) {
+    if (!refreshToken) {
+      throw new AppError('Refresh Token Required', 401, 'REFRESH_TOKEN_REQUIRED');
+    }
 
+    let decoded: any;
 
-   async refreshAccessToken(refreshToken: string) {
+    try {
+      decoded = Jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!);
+    } catch {
+      throw new AppError('Invalid refresh token', 401, 'INVALID_REFRESH_TOKEN');
+    }
 
-      if (!refreshToken) {
-         throw new AppError("Refresh Token Required", 401, "REFRESH_TOKEN_REQUIRED");
-      }
+    const refreshTokenEntity = await this.authRepository.findUserByRefreshToken(refreshToken);
 
-      let decoded: any;
+    if (!refreshTokenEntity) {
+      throw new AppError('Refresh token not found', 401, 'REFRESH_TOKEN_NOT_FOUND');
+    }
 
-      try {
-         decoded = Jwt.verify(
-            refreshToken,
-            process.env.JWT_REFRESH_SECRET!
-         );
-      } catch {
-         throw new AppError("Invalid refresh token", 401, "INVALID_REFRESH_TOKEN");
-      }
+    if (refreshTokenEntity.expires_at < new Date()) {
+      throw new AppError('Refresh token expired', 401, 'REFRESH_TOKEN_EXPIRED');
+    }
 
-      const refreshTokenEntity =
-         await this.authRepository.findUserByRefreshToken(refreshToken);
+    const newAccessToken = Jwt.sign({ user_id: decoded.user_id }, process.env.JWT_SECRET_KEY!, {
+      expiresIn: '15m',
+    });
 
-      if (!refreshTokenEntity) {
-         throw new AppError("Refresh token not found", 401, "REFRESH_TOKEN_NOT_FOUND");
-      }
+    return { accessToken: newAccessToken };
+  }
 
-      if (refreshTokenEntity.expires_at < new Date()) {
-         throw new AppError("Refresh token expired", 401, "REFRESH_TOKEN_EXPIRED");
-      }
+  async logout(refreshToken: string) {
+    if (!refreshToken) {
+      throw new AppError('Refresh Token required', 401, 'REFRESH_TOKEN_REQUIRED');
+    }
 
-      const newAccessToken = Jwt.sign(
-         { user_id: decoded.user_id },
-         process.env.JWT_SECRET_KEY!,
-         { expiresIn: "15m" }
-      );
+    const user = await this.authRepository.findUserByRefreshToken(refreshToken);
 
-      return { accessToken: newAccessToken };
-   };
+    if (!user) throw new AppError('Invalid refresh token', 401, 'INVALID_REFRESH_TOKEN');
 
-   async logout(refreshToken: string){
-      if(!refreshToken){
-         throw new AppError("Refresh Token required", 401, "REFRESH_TOKEN_REQUIRED");
-      }
+    await this.authRepository.deleteRefreshToken(refreshToken);
 
-      const user = await this.authRepository.findUserByRefreshToken(refreshToken);
-
-      if (!user) throw new AppError("Invalid refresh token", 401, "INVALID_REFRESH_TOKEN");
-
-      await this.authRepository.deleteRefreshToken(refreshToken);
-
-      return {message: "Logged out successfully"}
-
-   }
+    return { message: 'Logged out successfully' };
+  }
 }
-

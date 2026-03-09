@@ -1,60 +1,53 @@
-import { Response } from "express";
-import { PrescriptionService } from "./prescription.service";
-import { CreatePrescriptionDto } from "./dto/createPrescriptionDto";
-import { AuthRequest } from "../../middlewares/auth.middleware";
+import { Response } from 'express';
+import { PrescriptionService } from './prescription.service';
+import { CreatePrescriptionDto } from './dto/createPrescriptionDto';
+import { AuthRequest } from '../../middlewares/auth.middleware';
 
 export class PrescriptionController {
+  private prescriptionService = new PrescriptionService();
 
-   private prescriptionService = new PrescriptionService();
+  createPrescription = async (req: AuthRequest, res: Response) => {
+    const data: CreatePrescriptionDto = req.body;
 
-   createPrescription = async (req: AuthRequest, res: Response) => {
+    const prescription = await this.prescriptionService.createPrescription(data);
 
-      const data: CreatePrescriptionDto = req.body;
+    return res.status(201).json({
+      success: true,
+      message: 'Prescription created successfully',
+      data: prescription,
+    });
+  };
 
-      const prescription =
-         await this.prescriptionService.createPrescription(data);
+  getByMedicalRecord = async (req: AuthRequest, res: Response) => {
+    const { medicalRecordId } = req.params;
 
-      return res.status(201).json({
-         success: true,
-         message: "Prescription created successfully",
-         data: prescription
-      });
-   };
+    const data = await this.prescriptionService.getByMedicalRecord(String(medicalRecordId));
 
-   getByMedicalRecord = async (req: AuthRequest, res: Response) => {
-      const { medicalRecordId } = req.params;
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  };
 
-      const data = await this.prescriptionService.getByMedicalRecord(String(medicalRecordId));
+  getByPatient = async (req: AuthRequest, res: Response) => {
+    const { patientId } = req.params;
 
-      return res.status(200).json({
-         success: true,
-         data
-      });
-   };
+    const data = await this.prescriptionService.getByPatient(String(patientId));
 
-   getByPatient = async (req: AuthRequest, res: Response) => {
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  };
 
-      const { patientId } = req.params;
+  getById = async (req: AuthRequest, res: Response) => {
+    const { prescriptionId } = req.params;
 
-      const data = await this.prescriptionService.getByPatient(String(patientId));
+    const data = await this.prescriptionService.getById(String(prescriptionId));
 
-      return res.status(200).json({
-         success: true,
-         data
-      });
-   };
-
-   getById = async (req: AuthRequest, res: Response) => {
-
-      const { prescriptionId } = req.params;
-
-      const data =
-         await this.prescriptionService.getById(String(prescriptionId));
-
-      return res.status(200).json({
-         success: true,
-         data
-      });
-   }
-
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  };
 }

@@ -8,35 +8,35 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   OneToOne,
-} from "typeorm";
-import type{ Patient } from "./patient.entities.js";
-import type{ Doctor } from "./doctor.entities.js";
-import type{ Appointment } from "./appointment.entities.js";
+} from 'typeorm';
+import type { Patient } from './patient.entities.js';
+import type { Doctor } from './doctor.entities.js';
+import type { Appointment } from './appointment.entities.js';
 
-@Entity("medical_records")
+@Entity('medical_records')
 export class MedicalRecord {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   medical_record_id!: string;
 
-  @ManyToOne("Patient", "medical_records", { nullable: false, onDelete: "RESTRICT" })
-  @JoinColumn({ name: "patient_id" })
+  @ManyToOne('Patient', 'medical_records', { nullable: false, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @ManyToOne("Doctor", "medical_records", { nullable: false, onDelete: "RESTRICT" })
-  @JoinColumn({ name: "doctor_id" })
+  @ManyToOne('Doctor', 'medical_records', { nullable: false, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'doctor_id' })
   doctor!: Doctor;
 
-  @OneToOne("Appointment", { nullable: false, onDelete: "RESTRICT" })
-  @JoinColumn({ name: "appointment_id" })
+  @OneToOne('Appointment', { nullable: false, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'appointment_id' })
   appointment!: Appointment;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   diagnosis!: string;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   notes!: string;
 
-  @Column({ type: "date", default: () => "CURRENT_DATE" })
+  @Column({ type: 'date', default: () => 'CURRENT_DATE' })
   record_date!: Date;
 
   @CreateDateColumn()
