@@ -15,4 +15,8 @@ doctorRoute.post("/", authMiddleware, validate(createDoctorSchema), asyncHandler
 doctorRoute.patch("/:id", authMiddleware, validate(updateDoctorSchema), asyncHandler(doctorController.updateDoctor));
 doctorRoute.delete("/:id", authMiddleware, asyncHandler(doctorController.deleteDoctor));
 
+doctorRoute.patch("/appointments/:id/approve", authMiddleware, asyncHandler(doctorController.approveAppointment));
+
+doctorRoute.patch("/appointments/:id/reject", authMiddleware, asyncHandler(doctorController.rejectAppointment)
+);
 export default doctorRoute;

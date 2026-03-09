@@ -49,6 +49,29 @@ export class DoctorController {
       });
    };
 
+   approveAppointment = async (req: AuthRequest, res: Response) => {
+      const appointmentId = String(req.params.id);
+      const userId = String(req.user?.user_id);
+
+      const appointment = await this.doctorService.approveAppointment(userId,appointmentId);
+
+      return successResponse(res, "Appointment approve by you side.", appointment);
+   }
+
+   rejectAppointment = async (req: AuthRequest, res: Response) => {
+
+      const appointmentId = String(req.params.id);
+      const userId = String(req.user?.user_id);
+
+      const appointment = await this.doctorService.rejectAppointment(
+         userId,
+         appointmentId
+      );
+
+   return successResponse(res, "Appointment rejected", appointment);
+
+};
+
    // PATCH /:id - Doctor update karo
    updateDoctor = async (req: AuthRequest, res: Response) => {
       const doctor_id = req.params.id;

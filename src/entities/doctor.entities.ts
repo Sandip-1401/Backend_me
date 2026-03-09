@@ -22,6 +22,7 @@ export enum DoctorStatus {
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
   SUSPENDED = "SUSPENDED",
+  PENDING = "PENDING"
 }
 
 @Entity("doctors")
@@ -53,7 +54,7 @@ export class Doctor {
   @Column({ type: "boolean", default: true })
   is_available!: boolean;
 
-  @Column({ type: "enum", enum: DoctorStatus, default: DoctorStatus.ACTIVE })
+  @Column({ type: "enum", enum: DoctorStatus, default: DoctorStatus.PENDING })
   status!: DoctorStatus;
 
   @CreateDateColumn({ type: "timestamp" })

@@ -1,6 +1,8 @@
 import { AppError } from "../../common/errors/AppError";
 import { AppDataSource } from "../../config/datasource";
 import { RefreshToken } from "../../entities/refresh_token.entity";
+import RoleRepository from "../role/role.repository";
+import UserRoleRepository from "../user-role/user_role.repository";
 import { LoginDto, RegisterDto } from "./auth.dto";
 import { AuthRepository } from "./auth.repository";
 import bcrypt from "bcrypt";
@@ -8,6 +10,8 @@ import Jwt from "jsonwebtoken";
 
 export class AuthService {
    private authRepository = new AuthRepository();
+   private roleRepository = new RoleRepository();
+   private userRoleRepository = new UserRoleRepository();
    private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
 
    async login(dto: LoginDto) {
@@ -64,7 +68,7 @@ export class AuthService {
          name: dto.name,
          email: dto.email,
          password_hash: hashedPassword,
-         phone_number: dto.phone_no
+         phone_number: dto.phone_number
       })
       return user;
    };

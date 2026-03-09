@@ -13,7 +13,7 @@ appointmentRoute.get("/", authMiddleware, asyncHandler(appointmentController.get
 
 appointmentRoute.post("/", authMiddleware, validate(createAppointmentSchema), asyncHandler(appointmentController.createAppointment));
 
-appointmentRoute.get("/myappointment",authMiddleware, asyncHandler(appointmentController.getMyAppointments));
+appointmentRoute.get("/myappointment", authMiddleware, asyncHandler(appointmentController.getMyAppointments));
 
 appointmentRoute.patch("/:id", authMiddleware, validate(updateAppointmentSchema),asyncHandler(appointmentController.updateAppointment));
 

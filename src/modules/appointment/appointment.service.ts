@@ -188,8 +188,8 @@ export class AppointmentService {
          throw new AppError("Patient can only cancel appointment", 403, "PATIENT_CANCEL_ONLY");
       }
 
-      if (role === "DOCTOR" && data.status !== AppointmentStatusName.COMPLETED) {
-         throw new AppError("Doctor can only complete appointment", 403, "DOCTOR_COMPLETE_ONLY");
+      if (role === "DOCTOR" && data.status !== AppointmentStatusName.APPROVED) {
+         throw new AppError("Doctor can only approve appointment", 403, "DOCTOR_APPROVE_ONLY");
       }
 
       const newStatus = await this.appointmentStatusRepository.findOne({
@@ -230,8 +230,7 @@ export class AppointmentService {
       });
 
       if (patient) {
-         return await this.appointmentRepository.findBtPatientId(
-            patient.patient_id);
+         return await this.appointmentRepository.findBtPatientId(patient.patient_id);
       }
 
       const doctor = await this.doctorRepository.findOne({
@@ -239,8 +238,7 @@ export class AppointmentService {
       });
 
       if (doctor) {
-         return await this.appointmentRepository.findByDoctorId(
-            doctor.doctor_id);
+         return await this.appointmentRepository.findByDoctorId(doctor.doctor_id);
       }
 
       throw new AppError("User has no patient or doctor profile", 404, "USER_PROFILE_NOT_FOUND");

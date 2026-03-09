@@ -9,5 +9,5 @@ export const registerSchema = z.object({
    name: z.string().min(2),
    email: z.string().email(),
    passward: z.string().min(6),
-   phone_no: z.string().optional()
+   phone_number: z.string().min(10).max(10).optional()
 })

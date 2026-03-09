@@ -10,6 +10,8 @@ import UserRoleRepository from "../user-role/user_role.repository";
 import { DoctorRepository } from "./doctor.repository";
 import { getPagination } from "../../utils/pagination.util";
 import { buildPagination } from "../../utils/pagination-response.util";
+import { Appointment } from "../../entities/appointment.entities";
+import { AppointmentStatus, AppointmentStatusName } from "../../entities/appointment_status.entities";
 
 const ALLOWED_UPDATE_FIELDS = [
    "qualification",
@@ -28,6 +30,8 @@ export class DoctorService {
    private departmentRepository = AppDataSource.getRepository(Department);
    private roleRepositry = AppDataSource.getRepository(Role);
    private userRoleRepository = new UserRoleRepository();
+   private appointmentRepository = AppDataSource.getRepository(Appointment);
+   private appointmentStatusRepository = AppDataSource.getRepository(AppointmentStatus);
 
    async createDoctor(
       user_id: string,
@@ -39,21 +43,24 @@ export class DoctorService {
          address_id?: string;
       }
    ) {
-      
+
       const user = await this.userRepository.findOne({ where: { user_id } });
       if (!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
-      
+      if (!user.is_verified) {
+         throw new AppError("User is not Verified by Admin yet!", 404, "USER_NOT_VERIFIED");
+      }
+
       const existingDoctor = await this.doctorRepository.findByUserId(user_id);
       if (existingDoctor) throw new AppError("Doctor already exists", 409, "DOCTOR_ALREADY_EXISTS");
 
-      
+
       const department = await this.departmentRepository.findOne({
          where: { department_id: payload.department_id },
       });
       if (!department) throw new AppError("Department not found", 404, "DEPARTMENT_NOT_FOUND");
 
-      
+
       let address: Address | null = null;
       if (payload.address_id) {
          address = await this.addressRepository.findOne({
@@ -69,57 +76,132 @@ export class DoctorService {
          experience_years: payload.experience_years,
          consultation_fee: payload.consultation_fee,
          address: address ?? undefined,
-         status: DoctorStatus.ACTIVE,
-         is_available: true,
+         status: DoctorStatus.PENDING
       };
 
-      const doctor =  await this.doctorRepository.createDoctor(doctorData);
+      const doctor = await this.doctorRepository.createDoctor(doctorData);
 
       const doctorRole = await this.roleRepositry.findOne({
-         where: {role_name: "DOCTOR"}
+         where: { role_name: "DOCTOR" }
       });
 
       if (!doctorRole) throw new AppError("Doctor role not found", 404, "DOCTOR_ROLE_NOT_FOUND");
 
       const saved = await this.userRoleRepository.assignRole(user, doctorRole);
-      console.log("Saved userRole:", saved);       
+      console.log("Saved userRole:", saved);
 
       return doctor;
    }
-   
+
    async getDoctorByUserId(userId: string) {
       const doctor = await this.doctorRepository.findByUserId(userId);
       if (!doctor) throw new AppError("Doctor profile not found", 404, "DOCTOR_PROFILE_NOT_FOUND");
       return doctor;
    }
 
-   
+
    async getDoctorById(doctorId: string) {
       const doctor = await this.doctorRepository.findByDoctorId(doctorId);
-      if(!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
+      if (!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
       return doctor;
    }
 
-      async getAllDoctors(query: any) {
+   async getAllDoctors(query: any) {
 
-         const {page, limit, skip} = getPagination(query);//pagination
+      const { page, limit, skip } = getPagination(query);//pagination
 
-         const departmentId = query.department_id as string | undefined;//filtering
+      const departmentId = query.department_id as string | undefined;//filtering
 
-         const sort = query.sort as string | undefined;//sorting
-         const order = (query.order as "ASC" | "DESC") || "ASC";
+      const sort = query.sort as string | undefined;//sorting
+      const order = (query.order as "ASC" | "DESC") || "ASC";
 
-         const search = query.search as string | undefined; //searching
+      const search = query.search as string | undefined; //searching
 
-         const [doctor, total] =  await this.doctorRepository.findAllDoctors(skip, limit, departmentId, sort, order, search);
+      const [doctor, total] = await this.doctorRepository.findAllDoctors(skip, limit, departmentId, sort, order, search);
 
-         console.log(query);
+      console.log(query);
 
-         return buildPagination(doctor, total, page, limit)
+      return buildPagination(doctor, total, page, limit)
+   }
+
+   async approveAppointment(userId: string, appointmentId: string){
+      const user = await this.userRepository.findOne({
+         where: {user_id: userId}
+      })
+      if(!user) throw new AppError("Doctor for this User is not found", 404, "DOCTOR_NOT_FOUND");
+
+      const doctor = await this.doctorRepository.findByUserId(userId);
+
+      if(!doctor) throw new AppError("Dcotor not found", 404, "DOCTOR_NOT_FOUND");
+
+      const appointment = await this.appointmentRepository.findOne({
+         where: {
+            appointment_id: appointmentId,
+            doctor: {doctor_id: doctor.doctor_id}
+         },
+         relations: {doctor: true, patient: true, status: true}
+      });
+      if(!appointment) throw new AppError("Appointment not found", 404,"APPOINTMENT_NOT_FOUND");
+
+      console.log("status name",appointment.status.status_name);
+
+      if(appointment.status.status_name !== AppointmentStatusName.BOOKED){
+         throw new AppError("Only booked appointments can be approved",400,"INVALID_STATUS");
+      }
+      const approvedStatus = await this.appointmentStatusRepository.findOne({
+         where: { status_name: AppointmentStatusName.APPROVED }
+      });
+
+      if(!approvedStatus){
+         throw new AppError("Approved status not found",404,"STATUS_NOT_FOUND");
       }
 
+      return await this.doctorRepository.updateAppointmentStatus(
+         appointmentId,
+         { status: approvedStatus }
+      );
+   };
+
+   async rejectAppointment(userId: string, appointmentId: string){
+
+      const doctor = await this.doctorRepository.findByUserId(userId);
+
+      if(!doctor){
+         throw new AppError("Doctor not found",404,"DOCTOR_NOT_FOUND");
+      }
+
+      const appointment = await this.appointmentRepository.findOne({
+         where: {
+            appointment_id: appointmentId,
+            doctor: { doctor_id: doctor.doctor_id }
+         },
+         relations: { doctor: true, patient: true, status: true }
+      });
+
+      if(!appointment){
+         throw new AppError("Appointment not found",404,"APPOINTMENT_NOT_FOUND");
+      }
+
+      if(appointment.status.status_name !== AppointmentStatusName.BOOKED){
+         throw new AppError("Only booked appointments can be rejected", 400,"INVALID_STATUS");
+      }
+
+      const cancelledStatus = await this.appointmentStatusRepository.findOne({
+         where: { status_name: AppointmentStatusName.CANCELLED }
+      });
+
+      if(!cancelledStatus){
+         throw new AppError("Cancelled status not found",404,"STATUS_NOT_FOUND");
+      }
+
+      return await this.doctorRepository.updateAppointmentStatus(
+         appointmentId,
+         { status: cancelledStatus }
+      );
+   }
+
    async updateDoctorById(doctorId: string, data: Partial<Doctor>) {
-      
+
       const doctor = await this.doctorRepository.findByDoctorId(doctorId);
       if (!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
 
@@ -144,9 +226,9 @@ export class DoctorService {
    };
 
 
-   async deleteDoctor(doctorId: string){
+   async deleteDoctor(doctorId: string) {
       const doctor = await this.doctorRepository.findByDoctorId(doctorId);
-      if(!doctor){
+      if (!doctor) {
          throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
       }
       return await this.doctorRepository.deleteDoctor(doctorId);

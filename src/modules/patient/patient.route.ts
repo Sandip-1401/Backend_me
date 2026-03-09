@@ -16,4 +16,6 @@ patientRoute.get("/:id", authMiddleware, asyncHandler(patientController.getById)
 patientRoute.patch("/:id", authMiddleware, validate(updatePatientSchema), asyncHandler(patientController.updatePatient));
 patientRoute.delete("/:id", authMiddleware, asyncHandler(patientController.deletePatient));
 
+patientRoute.patch("/appointments/:id/cancle", authMiddleware , asyncHandler(patientController.cancleAppointment))
+
 export default patientRoute;

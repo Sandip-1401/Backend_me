@@ -8,10 +8,9 @@ import type{ Appointment } from "./appointment.entities.js";
 
 export enum AppointmentStatusName {
   BOOKED = "BOOKED",
-  CONFIRMED = "CONFIRMED",
+  APPROVED = "APPROVED",
   CANCELLED = "CANCELLED",
   COMPLETED = "COMPLETED",
-  NO_SHOW = "NO_SHOW",
 }
 
 @Entity("appointment_status")

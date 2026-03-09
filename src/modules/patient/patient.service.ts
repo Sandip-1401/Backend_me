@@ -1,5 +1,7 @@
 import { AppError } from "../../common/errors/AppError";
 import { AppDataSource } from "../../config/datasource";
+import { Appointment } from "../../entities/appointment.entities";
+import { AppointmentStatus, AppointmentStatusName } from "../../entities/appointment_status.entities";
 import { Role } from "../../entities/roles.entities";
 import { User } from "../../entities/user.entities";
 import { UserRole } from "../../entities/user_role.entities";
@@ -15,7 +17,10 @@ export class PatientService{
    private userRepositoy = AppDataSource.getRepository(User);
    private roleRepository = AppDataSource.getRepository(Role);
    private userRoleRepository = new UserRoleRepository();
-   // private userRoleRepository = AppDataSource.getRepository(UserRole);
+   private userRepository = AppDataSource.getRepository(User);
+   private appointmentRepository = AppDataSource.getRepository(Appointment);
+   private appointmentStatusRepository = AppDataSource.getRepository(AppointmentStatus);
+   
 
    async createPatient(data: CreatePatientDto){
        const user = await this.userRepositoy.findOne({
@@ -24,6 +29,10 @@ export class PatientService{
       
       if(!user){
          throw new AppError("User not found", 404, "USER_NOT_FOUND");
+      }
+
+      if(!user.is_verified){
+         throw new AppError("User is not Verified by Admin yet!", 404, "USER_NOT_VERIFIED");
       }
 
       const existsPatient = await this.patientRepository.findByUserId(data.user_id);
@@ -77,6 +86,42 @@ export class PatientService{
       }
       return patient;
    };
+
+   async cancleAppointment(userId: string, appointmentId: string){
+      const user = await this.userRepository.findOne({
+         where: {user_id: userId}
+      })
+      if(!user) throw new AppError("Patient for this User is not found", 404, "PATIENT_NOT_FOUND");
+      
+      const patien = await this.patientRepository.findByUserId(userId);
+      if(!patien) throw new AppError("Patient not found", 404, "PATIENT_NOT_FOUND");
+
+      const appointment = await this.appointmentRepository.findOne({
+         where: {
+            appointment_id: appointmentId,
+            patient: {patient_id: patien.patient_id}
+         },
+         relations: {doctor: true, patient: true, status: true}
+      });
+      if(!appointment) throw new AppError("Appointment not found", 404,"APPOINTMENT_NOT_FOUND");
+
+      if(appointment.status.status_name !== AppointmentStatusName.BOOKED){
+         throw new AppError("Only booked appointments can be cancelled", 400, "INVALID_STATUS");
+      }
+
+      const cancelledStatus = await this.appointmentStatusRepository.findOne({
+         where: { status_name: AppointmentStatusName.CANCELLED }
+      });
+
+      if(!cancelledStatus){
+         throw new AppError("Cancelled status not found",404,"STATUS_NOT_FOUND");
+      }
+
+      return await this.patientRepository.updateAppointmentStatus(
+         appointmentId,
+         { status: cancelledStatus }
+      );
+   }
 
    async updatePatient(patientId: string, data: UpdatePatientDto){
       const patient = await this.patientRepository.updatePatient(patientId, data);

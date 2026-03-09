@@ -1,5 +1,6 @@
 import { AppDataSource } from "../../config/datasource";
 import { Address } from "../../entities/address.entities";
+import { Appointment } from "../../entities/appointment.entities";
 import { Gender, Patient, PatientStatus } from "../../entities/patient.entities";
 import { User } from "../../entities/user.entities";
 import { CreatePatientDto } from "./dto/createPatientDto";
@@ -7,7 +8,8 @@ import { UpdatePatientDto } from "./dto/updatePatientDto";
 
 export class PatientRepository{
    private patientRepository = AppDataSource.getRepository(Patient);
-
+   private appointmentRepository = AppDataSource.getRepository(Appointment);
+   
    async createPatient(data: CreatePatientDto){
       
       const patient = this.patientRepository.create({
@@ -80,6 +82,22 @@ export class PatientRepository{
          relations: ["user", "address"]
       })
    }
+
+    async updateAppointmentStatus(appointmentId: string, data: Partial<Appointment>){
+         await this.appointmentRepository.update(
+         { appointment_id: appointmentId },
+         data
+      );
+   
+         return await this.appointmentRepository.findOne({
+            where: { appointment_id: appointmentId },
+            relations: {
+               doctor: true,
+               patient: true,
+               status: true
+            }
+         });
+      };
 
    async updatePatient(patientId: string, data: UpdatePatientDto){
       return this.patientRepository.update(patientId, {

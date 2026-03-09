@@ -7,5 +7,5 @@ export interface RegisterDto{
    name: string,
    email: string,
    passward: string,
-   phone_no?: string
+   phone_number?: string
 }

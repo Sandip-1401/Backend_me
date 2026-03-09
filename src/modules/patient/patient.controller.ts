@@ -1,3 +1,4 @@
+import { successResponse } from "../../common/utils/successResponse";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 import { CreatePatientDto } from "./dto/createPatientDto";
 import { UpdatePatientDto } from "./dto/updatePatientDto";
@@ -48,6 +49,15 @@ export class PatientCntroller {
          data: myprofile
       })
    };
+
+   cancleAppointment = async (req: AuthRequest, res: Response) => {
+      const userId = String(req.user?.user_id);
+      const appointmentId = String(req.params.id);
+
+      const appointment = await this.patientService.cancleAppointment(userId, appointmentId)
+      
+      return successResponse(res, "Appointment calcled by your side.", appointment);
+   }
 
    updatePatient = async (req: AuthRequest, res: Response) => {
       const patient_id = String(req.params.id);

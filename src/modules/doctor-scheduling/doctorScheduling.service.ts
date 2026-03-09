@@ -1,12 +1,23 @@
 import { AppError } from "../../common/errors/AppError";
+import { DoctorStatus } from "../../entities/doctor.entities";
 import { DayOfWeek, DoctorScheduling } from "../../entities/doctor_scheduling.entities";
+import { DoctorRepository } from "../doctor/doctor.repository";
 import { SchedulingRepository } from "./doctorScheduling.repository";
 
 export class DoctorSchedulingService {
 
    private schedulingRepository = new SchedulingRepository();
+   private doctorRepository = new DoctorRepository();
 
    async createSchedule(data: Partial<DoctorScheduling>) {
+      
+      const doctorId = data.doctor?.doctor_id
+      console.log("DOCTOR ID",doctorId);
+      const doctor = await this.doctorRepository.findByDoctorId(String(doctorId));
+
+      if(doctor?.status !== DoctorStatus.ACTIVE){
+         throw new AppError("Doctor is not active to create schedule", 401, "DOCTOR_NOT_ACTIVE");
+      }
 
       if (!data.doctor || !data.day_of_week) {
          throw new AppError("Doctor and day_of_week are required", 400, "DOCTOR_AND_DAY_REQUIRED");

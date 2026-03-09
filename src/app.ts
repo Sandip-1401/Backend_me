@@ -10,6 +10,7 @@ import medicalRecordRoute from "./modules/medical-record/medical_record.routes";
 import prescriptionRoute from "./modules/prescription/prescription.routes";
 import scheduleRoute from "./modules/doctor-scheduling/doctorScheduling.routes";
 import { errorMiddleware } from "./middlewares/error.middleware";
+import adminRoute from "./modules/admin/admin.routes";
 
 const app = express();
 
@@ -23,7 +24,8 @@ app.use("/api/patients", patientRoute);
 app.use("/api/appointments", appointmentRoute)
 app.use("/api/medical-records", medicalRecordRoute);
 app.use("/api/prescriptions", prescriptionRoute);
-app.use("/api/schedule", scheduleRoute)
+app.use("/api/schedule", scheduleRoute);
+app.use("/api/admin", adminRoute);
 
 app.get("/", (req, res) => {
    res.status(200).json({

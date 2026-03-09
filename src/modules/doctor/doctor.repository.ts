@@ -1,9 +1,12 @@
 import { ILike } from "typeorm";
 import { AppDataSource } from "../../config/datasource";
 import { Doctor } from "../../entities/doctor.entities";
+import { Appointment } from "../../entities/appointment.entities";
+import { AppointmentStatus, AppointmentStatusName } from "../../entities/appointment_status.entities";
 
 export class DoctorRepository {
    private doctorRepository = AppDataSource.getRepository(Doctor);
+   private appointmentRepository = AppDataSource.getRepository(Appointment);
 
    async createDoctor(data: Partial<Doctor>) {
       const doctor = this.doctorRepository.create(data);
@@ -73,6 +76,23 @@ export class DoctorRepository {
 
       return [doctors, total];
    }
+
+   async updateAppointmentStatus(appointmentId: string, data: Partial<Appointment>){
+      await this.appointmentRepository.update(
+      { appointment_id: appointmentId },
+      data
+   );
+
+      return await this.appointmentRepository.findOne({
+         where: { appointment_id: appointmentId },
+         relations: {
+            doctor: true,
+            patient: true,
+            status: true
+         }
+      });
+   };
+
 
    async updateDoctor(doctorId: string, data: Partial<Doctor>) {
       return this.doctorRepository.update({ doctor_id: doctorId }, data);
