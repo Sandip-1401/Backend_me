@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 import { DoctorSchedulingService } from './doctorScheduling.service';
+import { successResponse } from '../../common/utils/successResponse';
 
 export class DoctorSchedulingController {
   private schedulingService = new DoctorSchedulingService();
@@ -17,11 +18,7 @@ export class DoctorSchedulingController {
       max_patients: req.body.max_patients,
     });
 
-    return res.status(201).json({
-      success: true,
-      message: 'Doctor schedule created',
-      data: schedule,
-    });
+    return successResponse(res,'Doctor schedule created', schedule )
   };
 
   getDoctorSchedule = async (req: AuthRequest, res: Response) => {
@@ -29,10 +26,7 @@ export class DoctorSchedulingController {
 
     const schedules = await this.schedulingService.getDoctorSchedule(String(doctorId));
 
-    return res.status(200).json({
-      success: true,
-      data: schedules,
-    });
+    return successResponse(res,'Doctor schedule fetched', schedules)
   };
 
   updateSchedule = async (req: AuthRequest, res: Response) => {
@@ -40,11 +34,8 @@ export class DoctorSchedulingController {
 
     const updated = await this.schedulingService.updateSchedule(String(scheduleId), req.body);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Schedule updated',
-      data: updated,
-    });
+    return successResponse(res,'Doctor schedule updated successfully', updated)
+    
   };
 
   deleteSchedule = async (req: AuthRequest, res: Response) => {
@@ -52,9 +43,6 @@ export class DoctorSchedulingController {
 
     await this.schedulingService.deleteSchedule(String(scheduleId));
 
-    return res.status(200).json({
-      success: true,
-      message: 'Schedule deleted',
-    });
+    return successResponse(res,'Doctor schedule delete successfully')
   };
 }

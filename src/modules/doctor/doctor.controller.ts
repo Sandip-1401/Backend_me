@@ -7,30 +7,20 @@ import { asyncHandler } from '../../common/utils/asyncHandler';
 export class DoctorController {
   private doctorService = new DoctorService();
 
-  // POST for logged-in user
   createDoctor = async (req: AuthRequest, res: Response) => {
     const user_id = req.user!.user_id;
     const doctor = await this.doctorService.createDoctor(user_id, req.body);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Doctor created successfully',
-      data: doctor,
-    });
+    return successResponse(res, 'Doctor created successfully', doctor)
   };
 
-  // GET for own profile (logged-in doctor)
   getMyProfile = async (req: AuthRequest, res: Response) => {
     const user_id = req.user!.user_id;
     const doctor = await this.doctorService.getDoctorByUserId(user_id);
 
-    return res.status(200).json({
-      success: true,
-      data: doctor,
-    });
+    return successResponse(res, 'Doctor fetched successfully', doctor)
   };
 
-  // GET /:id - Kisi bhi doctor ka profile dekho (admin / public)
   getDoctorById = asyncHandler(async (req: AuthRequest, res: Response) => {
     const doctor_id = req.params.id;
     const doctor = await this.doctorService.getDoctorById(String(doctor_id));
@@ -38,14 +28,9 @@ export class DoctorController {
     return successResponse(res, 'Doctor fetched successfully', doctor);
   });
 
-  // GET / - All doctors
   getAllDoctors = async (req: AuthRequest, res: Response) => {
     const doctors = await this.doctorService.getAllDoctors(req.query);
-
-    return res.status(200).json({
-      success: true,
-      data: doctors,
-    });
+    return successResponse(res, 'Doctors created successfully', doctors)
   };
 
   approveAppointment = async (req: AuthRequest, res: Response) => {
@@ -66,42 +51,21 @@ export class DoctorController {
     return successResponse(res, 'Appointment rejected', appointment);
   };
 
-  // PATCH /:id - Doctor update karo
   updateDoctor = async (req: AuthRequest, res: Response) => {
     const doctor_id = req.params.id;
 
     const { qualification, experience_years, consultation_fee, is_available, status } = req.body;
 
-    const data = {
-      qualification,
-      experience_years,
-      consultation_fee,
-      is_available,
-      status,
-    };
+    const data = { qualification, experience_years, consultation_fee, is_available, status};
 
-    await this.doctorService.updateDoctorById(String(doctor_id), data);
+    const doctor = await this.doctorService.updateDoctorById(String(doctor_id), data);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Doctor updated successfully',
-    });
+    return successResponse(res, 'Doctor updated successfully', doctor);
   };
 
   deleteDoctor = async (req: AuthRequest, res: Response) => {
-    try {
       const doctorId = req.params.id;
       await this.doctorService.deleteDoctor(String(doctorId));
-
-      return res.status(200).json({
-        success: true,
-        message: 'Doctor delete successfully',
-      });
-    } catch (err: any) {
-      return res.status(400).json({
-        success: false,
-        message: err.message,
-      });
-    }
+      return successResponse(res, 'Doctor delete successfully');
   };
 }

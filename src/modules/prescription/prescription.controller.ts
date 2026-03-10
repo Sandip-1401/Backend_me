@@ -3,6 +3,7 @@ import { PrescriptionService } from './prescription.service';
 import { CreatePrescriptionDto } from './dto/createPrescriptionDto';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 import { AppError } from '../../common/errors/AppError';
+import { successResponse } from '../../common/utils/successResponse';
 
 export class PrescriptionController {
   private prescriptionService = new PrescriptionService();
@@ -19,11 +20,8 @@ export class PrescriptionController {
 
     const prescription = await this.prescriptionService.createPrescription(userId, data);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Prescription created successfully',
-      data: prescription,
-    });
+    return successResponse(res, 'Prescription created successfully', prescription)
+  
   };
 
   getByMedicalRecord = async (req: AuthRequest, res: Response) => {
@@ -31,10 +29,7 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getByMedicalRecord(String(medicalRecordId));
 
-    return res.status(200).json({
-      success: true,
-      data,
-    });
+    return successResponse(res, 'Prescription fetched successfully', data)
   };
 
   getByPatient = async (req: AuthRequest, res: Response) => {
@@ -48,10 +43,7 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getByPatient(userId, String(patientId));
 
-    return res.status(200).json({
-      success: true,
-      data,
-    });
+    return successResponse(res, 'Prescription fetched successfully', data)
   };
 
   getByDoctoe = async (req: AuthRequest, res: Response) => {
@@ -65,10 +57,7 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getByDoctor(userId, String(doctorId));
 
-    return res.status(200).json({
-      success: true,
-      data,
-    });
+    return successResponse(res, 'Prescription fetched successfully', data)
   };
 
   getById = async (req: AuthRequest, res: Response) => {
@@ -76,9 +65,6 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getById(String(prescriptionId));
 
-    return res.status(200).json({
-      success: true,
-      data,
-    });
+    return successResponse(res, 'Prescription fetched successfully', data)
   };
 }

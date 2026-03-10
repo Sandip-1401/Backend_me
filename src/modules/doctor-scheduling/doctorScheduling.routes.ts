@@ -7,6 +7,7 @@ import {
   updateDoctorScheduleSchema,
 } from './doctorScheduling.validation';
 import { asyncHandler } from '../../common/utils/asyncHandler';
+import { requireRole } from '../../middlewares/role.middleware';
 
 const scheduleRoute = Router();
 
@@ -14,17 +15,17 @@ const controller = new DoctorSchedulingController();
 
 scheduleRoute.post(
   '/',
-  authMiddleware,
+  authMiddleware,requireRole(["DOCTOR"]),
   validate(createDoctorScheduleSchema),
   asyncHandler(controller.createSchedule),
 );
 scheduleRoute.get('/:doctorId', authMiddleware, asyncHandler(controller.getDoctorSchedule));
 scheduleRoute.patch(
   '/:id',
+  authMiddleware,requireRole(["DOCTOR"]),
   validate(updateDoctorScheduleSchema),
-  authMiddleware,
   asyncHandler(controller.updateSchedule),
 );
-scheduleRoute.delete('/:id', authMiddleware, asyncHandler(controller.deleteSchedule));
+scheduleRoute.delete('/:id', authMiddleware,requireRole(["DOCTOR"]), asyncHandler(controller.deleteSchedule));
 
 export default scheduleRoute;

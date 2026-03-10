@@ -3,8 +3,12 @@ import { AuthRequest } from './auth.middleware';
 import { AppError } from '../common/errors/AppError';
 import { AppDataSource } from '../config/datasource';
 import { UserRole } from '../entities/user_role.entities';
+import { In } from 'typeorm';
 
-export const requireRole = (roleName: string) => {
+export const requireRole = (roles: string[]) => {
+
+  const userRoleRepository = AppDataSource.getRepository(UserRole);
+  
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     const userId = req.user?.user_id;
 
@@ -12,15 +16,12 @@ export const requireRole = (roleName: string) => {
       throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
 
-    const userRoleRepository = AppDataSource.getRepository(UserRole);
-
     const userRole = await userRoleRepository.findOne({
       where: {
         user: { user_id: userId },
-        role: { role_name: roleName },
+        role: { role_name: In(roles) },
         is_active: true,
       },
-      relations: ['role'],
     });
 
     if (!userRole) {

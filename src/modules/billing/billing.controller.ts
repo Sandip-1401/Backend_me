@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 import { BillingService } from './billing.service';
+import { successResponse } from '../../common/utils/successResponse';
 
 export class BillingController {
   private billingService = new BillingService();
@@ -11,11 +12,8 @@ export class BillingController {
 
     const bill = await this.billingService.generateBillFromPrescription(prescriptionId, userId);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Bill generated successfully',
-      data: bill,
-    });
+    return successResponse(res, 'Bill generated successfully', bill)
+
   };
 
   getBillByAppointment = async (req: AuthRequest, res: Response) => {
@@ -23,9 +21,6 @@ export class BillingController {
 
     const bill = await this.billingService.getBillByAppointment(appointmentId);
 
-    return res.status(200).json({
-      success: true,
-      data: bill,
-    });
+    return successResponse(res, 'Bill fetched successfully', bill)
   };
 }

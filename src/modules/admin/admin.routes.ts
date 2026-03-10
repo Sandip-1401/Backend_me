@@ -11,14 +11,15 @@ const adminController = new AdminController();
 adminRoute.get(
   '/pending-doctors',
   authMiddleware,
-  requireRole('ADMIN'),
+  requireRole(['ADMIN']),
   asyncHandler(adminController.getPendingDoctors),
 );
 adminRoute.patch(
   '/active-doctor/:id',
   authMiddleware,
+   requireRole(['ADMIN']),
   asyncHandler(adminController.activedoctorById),
 );
-adminRoute.get('/unverified-users', authMiddleware, asyncHandler(adminController.unverifiedUser));
-adminRoute.patch('/verify-user/:id', authMiddleware, asyncHandler(adminController.verifyUserById));
+adminRoute.get('/unverified-users', authMiddleware, requireRole(['ADMIN']), asyncHandler(adminController.unverifiedUser));
+adminRoute.patch('/verify-user/:id', authMiddleware, requireRole(['ADMIN']), asyncHandler(adminController.verifyUserById));
 export default adminRoute;

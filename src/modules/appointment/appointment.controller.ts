@@ -1,3 +1,4 @@
+import { successResponse } from '../../common/utils/successResponse';
 import { AppDataSource } from '../../config/datasource';
 import { Doctor } from '../../entities/doctor.entities';
 import { AuthRequest } from '../../middlewares/auth.middleware';
@@ -17,11 +18,7 @@ export class AppointmentController {
 
     const appointment = await this.appointmentService.createAppointment(userId, data);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Appointment booked successfully',
-      data: appointment,
-    });
+    return successResponse(res, 'Appointment booked successfully', appointment)
   };
 
   updateAppointment = async (req: AuthRequest, res: Response) => {
@@ -35,11 +32,8 @@ export class AppointmentController {
 
     const updated = await this.appointmentService.updateStatus(appointmentId, data, role);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Appointment updated successfully',
-      data: updated,
-    });
+    return successResponse(res, 'Appointment updated successfully', updated)
+
   };
 
   getMyAppointments = async (req: AuthRequest, res: Response) => {
@@ -47,19 +41,13 @@ export class AppointmentController {
 
     const appointments = await this.appointmentService.getMyAppointments(userId);
 
-    return res.status(200).json({
-      success: true,
-      data: appointments,
-    });
+    return successResponse(res, 'Appointment fetched successfully', appointments)
   };
 
   getAll = async (req: AuthRequest, res: Response) => {
     const appointments = await this.appointmentService.getAllAppointments(req.query);
 
-    return res.status(200).json({
-      success: true,
-      data: appointments,
-    });
+    return successResponse(res, 'Appointment fetched successfully', appointments)
   };
 
   getAvailableSlots = async (req: AuthRequest, res: Response) => {
@@ -68,9 +56,6 @@ export class AppointmentController {
 
     const slots = await this.appointmentService.giveAvilableSlots(String(doctorId), date);
 
-    return res.status(200).json({
-      success: true,
-      data: slots,
-    });
+    return successResponse(res, 'Available slots...', slots)
   };
 }

@@ -5,6 +5,7 @@ import { BillingRepository } from "../billing/billing.repository";
 import { AppointmentStatus, AppointmentStatusName } from "../../entities/appointment_status.entities";
 import { AppDataSource } from "../../config/datasource";
 import { Appointment } from "../../entities/appointment.entities";
+import { successResponse } from "../../common/utils/successResponse";
 
 export class PaymentController {
 
@@ -17,12 +18,9 @@ export class PaymentController {
 
     const billId = String(req.params.billId);
 
-    const qr = await this.paymentService.generateQR(billId);
+    const QR = await this.paymentService.generateQR(billId);
 
-    return res.json({
-      success: true,
-      data: qr,
-    });
+    return successResponse(res, "QR code generated successfully", QR)
   };
 
   payBill = async (req: AuthRequest, res: Response) => {
@@ -44,11 +42,7 @@ export class PaymentController {
 
       await this.appointmentRepository.save(bill.appointment);
    }
-
-   return res.json({
-      success: true,
-      message: "Payment successful",
-      data: payment,
-   });
+   return successResponse(res, "Payment Completed successful", payment)
+   
    };
 }

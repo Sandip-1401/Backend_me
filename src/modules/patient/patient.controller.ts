@@ -13,40 +13,25 @@ export class PatientCntroller {
 
     const patient = await this.patientService.createPatient(data);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Patient created Successfully',
-      data: patient,
-    });
+    return successResponse(res, 'Patient created Successfully', patient);
+
   };
 
   getAll = async (req: AuthRequest, res: Response) => {
     const patients = await this.patientService.findAllPatient(req.query);
-
-    return res.status(200).json({
-      success: true,
-      data: patients,
-    });
+    return successResponse(res, 'Patient fetched Successfully', patients);
   };
 
   getById = async (req: AuthRequest, res: Response) => {
     const patient_id = String(req.params.id);
     const patient = await this.patientService.findPatientById(patient_id);
-
-    return res.status(200).json({
-      success: true,
-      data: patient,
-    });
+    return successResponse(res, 'Patient fetched Successfully', patient)
   };
 
   getMyProfile = async (req: AuthRequest, res: Response) => {
     const user_id = String(req.user?.user_id);
     const myprofile = await this.patientService.findPatientByUserId(user_id);
-
-    return res.status(200).json({
-      success: true,
-      data: myprofile,
-    });
+    return successResponse(res, 'Patient profile fetched Successfully', myprofile)
   };
 
   cancleAppointment = async (req: AuthRequest, res: Response) => {
@@ -64,19 +49,13 @@ export class PatientCntroller {
 
     await this.patientService.updatePatient(patient_id, data);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Patient updated Successfully',
-    });
+    return successResponse(res, 'Patient updated Successfully',)
   };
 
   deletePatient = async (req: AuthRequest, res: Response) => {
     const patient_id = String(req.params.id);
 
     await this.patientService.deletePatient(patient_id);
-    return res.status(200).json({
-      success: true,
-      message: 'Patient deleted Successfully',
-    });
+    return successResponse(res, 'Patient deleted Successfully',)
   };
 }
