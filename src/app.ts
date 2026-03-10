@@ -13,6 +13,7 @@ import { errorMiddleware } from './middlewares/error.middleware';
 import adminRoute from './modules/admin/admin.routes';
 import billingRoute from './modules/billing/billing.route';
 import paymentRoute from './modules/payment/payment.routes';
+import addressRoute from './modules/address/address.route';
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/schedule', scheduleRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/billing', billingRoute);
 app.use('/api/payment', paymentRoute)
+app.use('/api/address', addressRoute);
 
 app.get('/', (req, res) => {
   res.status(200).json({
