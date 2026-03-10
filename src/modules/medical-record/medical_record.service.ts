@@ -11,27 +11,26 @@ export class MedicalRecordService {
   private doctorRepository = new DoctorRepository();
 
   async createRecord(userId: string, data: CreateMedicalRecordDto) {
-
     console.log(userId);
     const doctor = await this.doctorRepository.findByUserId(userId);
     console.log(doctor);
-    if(!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
+    if (!doctor) throw new AppError('Doctor not found', 404, 'DOCTOR_NOT_FOUND');
 
     const appointment = await this.appointmentRepository.findById(data.appointment_id);
 
     if (!appointment) {
       throw new AppError('Appointment not found', 404, 'APPOINTMENT_NOT_FOUND');
     }
-    
+
     const existingRecord = await this.medicalRecordRepository.findByAppointment(
       data.appointment_id,
     );
 
     if (appointment.doctor.doctor_id !== doctor.doctor_id) {
       throw new AppError(
-        "You are not allowed to create record for this appointment",
+        'You are not allowed to create record for this appointment',
         403,
-        "FORBIDDEN"
+        'FORBIDDEN',
       );
     }
 

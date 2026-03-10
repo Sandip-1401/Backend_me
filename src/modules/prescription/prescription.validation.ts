@@ -5,6 +5,7 @@ const prescriptionMedicineSchema = z.object({
   dosage: z.string().min(1),
   frequency: z.string().min(1),
   duration_days: z.number().min(1),
+  unit_price: z.number().optional(),
 });
 
 export const createPrescriptionSchema = z.object({

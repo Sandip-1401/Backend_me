@@ -11,7 +11,7 @@ export class PrescriptionController {
     console.log(req.user?.user_id);
 
     if (!req.user?.user_id) {
-      throw new AppError("Unauthorized",401,"UNAUTHORIZED");
+      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
 
     const userId = req.user?.user_id;
@@ -41,7 +41,7 @@ export class PrescriptionController {
     const { patientId } = req.params;
 
     if (!req.user?.user_id) {
-      throw new AppError("Unauthorized",401,"UNAUTHORIZED");
+      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
 
     const userId = req.user?.user_id;
@@ -58,7 +58,7 @@ export class PrescriptionController {
     const { doctorId } = req.params;
 
     if (!req.user?.user_id) {
-      throw new AppError("Unauthorized",401,"UNAUTHORIZED");
+      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
 
     const userId = req.user?.user_id;

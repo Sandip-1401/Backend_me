@@ -12,6 +12,9 @@ export class Payment {
   @PrimaryGeneratedColumn('uuid')
   payment_id!: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  transaction_id?: string;
+
   @ManyToOne('Bill', 'payments', { nullable: false })
   @JoinColumn({ name: 'bill_id' })
   bill!: Bill;
@@ -20,13 +23,13 @@ export class Payment {
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   payment_date!: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'varchar' })
   payment_method!: string;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount!: number;
 
   @Column({ type: 'enum', enum: PaymentStatus })

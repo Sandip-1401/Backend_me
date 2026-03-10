@@ -9,18 +9,16 @@ export class MedicalRecordController {
   private medicalRecordService = new MedicalRecordService();
 
   createRecord = async (req: AuthRequest, res: Response) => {
-
     if (!req.user?.user_id) {
-      throw new AppError("Unauthorized",401,"UNAUTHORIZED");
+      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
 
-    const userId = req.user.user_id
+    const userId = req.user.user_id;
     const data: CreateMedicalRecordDto = req.body;
 
     const record = await this.medicalRecordService.createRecord(userId, data);
 
-    return successResponse(res, "Medical Record created Successfully", record);
-
+    return successResponse(res, 'Medical Record created Successfully', record);
   };
 
   getPatientRecord = async (req: AuthRequest, res: Response) => {
@@ -28,8 +26,7 @@ export class MedicalRecordController {
 
     const record = await this.medicalRecordService.getPatientRecords(String(patient_id));
 
-    return successResponse(res, "All records for this Patient" ,record);
-  
+    return successResponse(res, 'All records for this Patient', record);
   };
 
   getDoctorRecord = async (req: AuthRequest, res: Response) => {
@@ -37,7 +34,7 @@ export class MedicalRecordController {
 
     const record = await this.medicalRecordService.getDoctorRecords(String(doctor_id));
 
-    return successResponse(res, "All records for this Doctor" ,record);
+    return successResponse(res, 'All records for this Doctor', record);
   };
 
   getAppointmentRecored = async (req: AuthRequest, res: Response) => {
@@ -45,12 +42,12 @@ export class MedicalRecordController {
 
     const record = await this.medicalRecordService.getAppointmentRecord(String(appointment_id));
 
-    return successResponse(res, "All records for this Appointment" ,record);
+    return successResponse(res, 'All records for this Appointment', record);
   };
 
   getAllRecords = async (req: AuthRequest, res: Response) => {
     const record = await this.medicalRecordService.getAllAppointment();
 
-    return successResponse(res, "All records..." ,record);
-  }
+    return successResponse(res, 'All records...', record);
+  };
 }

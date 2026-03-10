@@ -3,4 +3,5 @@ export interface CreatePrescriptionMedicineDto {
   dosage: string;
   frequency: string;
   duration_days: number;
+  unit_price: number;
 }

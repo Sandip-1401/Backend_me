@@ -25,7 +25,7 @@ export class Bill {
   @Column({ type: 'varchar', unique: true })
   bill_number!: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', default: () => 'CURRENT_TIMESTAMP' })
   bill_date!: Date;
 
   @Column({ type: 'decimal' })
@@ -37,7 +37,11 @@ export class Bill {
   @Column({ type: 'decimal' })
   net_amount!: number;
 
-  @Column({ type: 'enum', enum: BillStatus })
+  @Column({
+    type: 'enum',
+    enum: BillStatus,
+    default: BillStatus.PENDING,
+  })
   status!: BillStatus;
 
   @OneToMany('BillItem', 'bill')

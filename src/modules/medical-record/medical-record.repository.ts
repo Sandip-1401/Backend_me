@@ -16,7 +16,7 @@ export class MedicalRecordRepository {
         appointment: true,
         doctor: true,
         patient: true,
-      }
+      },
     });
   }
 

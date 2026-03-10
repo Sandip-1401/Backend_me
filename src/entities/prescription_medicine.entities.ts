@@ -21,4 +21,7 @@ export class PrescriptionMedicine {
 
   @Column({ type: 'int' })
   duration_days!: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  unit_price?: number;
 }

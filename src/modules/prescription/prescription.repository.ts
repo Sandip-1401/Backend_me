@@ -45,11 +45,10 @@ export class PrescriptionRepository {
     });
   }
 
-
   async findByDoctor(doctorId: string) {
     return this.prescriptionRepository.find({
       where: {
-        doctor: {doctor_id: doctorId}
+        doctor: { doctor_id: doctorId },
       },
       relations: {
         medicines: true,
@@ -72,7 +71,9 @@ export class PrescriptionRepository {
         medicines: true,
         doctor: true,
         patient: true,
-        medical_record: true,
+        medical_record: {
+          appointment: true,
+        },
       },
     });
   }

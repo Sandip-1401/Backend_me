@@ -20,7 +20,7 @@ medicalRecordRoute.get(
   '/patient/:patient_id',
   authMiddleware,
   asyncHandler(medicalRecordController.getPatientRecord),
-);  
+);
 medicalRecordRoute.get(
   '/doctor/:doctor_id',
   authMiddleware,

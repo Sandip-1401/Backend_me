@@ -15,9 +15,7 @@ export class PrescriptionService {
   private patientRepository = new PatientRepository();
 
   async createPrescription(userId: string, data: CreatePrescriptionDto) {
-
     return await AppDataSource.transaction(async (manager) => {
-
       const prescriptionRepo = manager.getRepository(Prescription);
       const medicineRepo = manager.getRepository(PrescriptionMedicine);
       const medicalRecordRepo = manager.getRepository(MedicalRecord);
@@ -36,17 +34,16 @@ export class PrescriptionService {
 
       const doctor = await this.doctorRepository.findByUserId(userId);
       console.log(doctor);
-      if(!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
+      if (!doctor) throw new AppError('Doctor not found', 404, 'DOCTOR_NOT_FOUND');
 
-      if(doctor.doctor_id !== medicalRecord?.doctor.doctor_id){
+      if (doctor.doctor_id !== medicalRecord?.doctor.doctor_id) {
         throw new AppError(
-          "You are not allowed to create prescription for this medical record",
+          'You are not allowed to create prescription for this medical record',
           403,
-          "FORBIDDEN"
+          'FORBIDDEN',
         );
       }
 
-    
       const existingPrescription = await prescriptionRepo.findOne({
         where: {
           medical_record: {
@@ -76,6 +73,7 @@ export class PrescriptionService {
         dosage: medicine.dosage,
         frequency: medicine.frequency,
         duration_days: medicine.duration_days,
+        unit_price: medicine.unit_price,
       }));
 
       await medicineRepo.save(medicines);
@@ -95,13 +93,12 @@ export class PrescriptionService {
   }
 
   async getByPatient(userId: string, patientId: string) {
-
     const prescriptions = await this.prescriptionRepository.findByPatient(patientId);
 
     const patient = await this.patientRepository.findById(patientId);
 
-    if(patient?.user.user_id !== userId){
-      throw new AppError("You don't have permission for this", 400, "UNAUTHORIZED");
+    if (patient?.user.user_id !== userId) {
+      throw new AppError("You don't have permission for this", 400, 'UNAUTHORIZED');
     }
 
     if (!prescriptions || prescriptions.length === 0) {
@@ -116,13 +113,12 @@ export class PrescriptionService {
   }
 
   async getByDoctor(userId: string, doctorId: string) {
-
     const prescriptions = await this.prescriptionRepository.findByDoctor(doctorId);
 
     const doctor = await this.doctorRepository.findByDoctorId(doctorId);
 
-    if(doctor?.user.user_id !== userId){
-      throw new AppError("You don't have permission for this", 400, "UNAUTHORIZED");
+    if (doctor?.user.user_id !== userId) {
+      throw new AppError("You don't have permission for this", 400, 'UNAUTHORIZED');
     }
 
     if (!prescriptions || prescriptions.length === 0) {

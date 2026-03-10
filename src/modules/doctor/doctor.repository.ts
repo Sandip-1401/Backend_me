@@ -31,11 +31,11 @@ export class DoctorRepository {
       relations: ['user', 'department', 'address'],
     });
   }
-  
-  async findDoctorByMedicalRecord(medical_record_id: string){
+
+  async findDoctorByMedicalRecord(medical_record_id: string) {
     return await this.doctorRepository.findOne({
-      where: {medical_records: {medical_record_id: medical_record_id}}
-    })
+      where: { medical_records: { medical_record_id: medical_record_id } },
+    });
   }
 
   async findAllDoctors(

@@ -15,13 +15,26 @@ prescriptionRoute.post(
   asyncHandler(prescriptionController.createPrescription),
 );
 prescriptionRoute.get(
-  '/medical-record/:medicalRecordId', authMiddleware,
+  '/medical-record/:medicalRecordId',
+  authMiddleware,
   asyncHandler(prescriptionController.getByMedicalRecord),
 );
-prescriptionRoute.get('/patient/:patientId', authMiddleware, asyncHandler(prescriptionController.getByPatient));
+prescriptionRoute.get(
+  '/patient/:patientId',
+  authMiddleware,
+  asyncHandler(prescriptionController.getByPatient),
+);
 
-prescriptionRoute.get('/doctor/:doctorId', authMiddleware, asyncHandler(prescriptionController.getByDoctoe));
+prescriptionRoute.get(
+  '/doctor/:doctorId',
+  authMiddleware,
+  asyncHandler(prescriptionController.getByDoctoe),
+);
 
-prescriptionRoute.get('/:prescriptionId', authMiddleware, asyncHandler(prescriptionController.getById));
+prescriptionRoute.get(
+  '/:prescriptionId',
+  authMiddleware,
+  asyncHandler(prescriptionController.getById),
+);
 
 export default prescriptionRoute;
