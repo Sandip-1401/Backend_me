@@ -14,6 +14,18 @@ export class DepartmentController{
       return successResponse(res, "Department created successfully", deparment)
    };
 
+   getAll = async (req: AuthRequest, res: Response) => {
+      const deparment = await this.departmentService.getAll();
+      return successResponse(res,"Departments fetched successfully", deparment)
+   }
+
+   getById = async (req: AuthRequest, res: Response) => {
+      const department_id = String(req.params.id);
+
+     const deparment = await this.departmentService.getById(department_id);
+      return successResponse(res,"Departments fetched successfully", deparment)
+   }
+
    updateDepartment = async (req: AuthRequest, res: Response) => {
       const data: UpdateDepartmentDto = req.body;
       const userId = String(req.user?.user_id);

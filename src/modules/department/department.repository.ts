@@ -10,6 +10,16 @@ export class DepartmentRepository{
       return await this.departmentRepository.save(deparment);
    }
 
+   async getAll(){
+      return await this.departmentRepository.find();
+   }
+
+   async getById(department_id: string){
+      return await this.departmentRepository.findOne({
+         where: {department_id: department_id}
+      })
+   }
+
    async updateDepartment(departmentId: string, data: Partial<Department>){
       return await this.departmentRepository.update(departmentId, data);
    }

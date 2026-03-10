@@ -8,6 +8,10 @@ const departmentRoute = Router();
 
 const deparmentController = new DepartmentController();
 
+departmentRoute.get("/", authMiddleware, requireRole("ADMIN"), asyncHandler(deparmentController.getAll));
+
+departmentRoute.get("/:id", authMiddleware, requireRole("ADMIN"), asyncHandler(deparmentController.getById));
+
 departmentRoute.post("/", authMiddleware, requireRole("ADMIN"), asyncHandler(deparmentController.createDepartment));
 
 departmentRoute.patch("/:id", authMiddleware, requireRole("ADMIN"), asyncHandler(deparmentController.updateDepartment));

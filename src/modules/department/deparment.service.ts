@@ -6,19 +6,27 @@ export class DepartmentService{
    
    async createDepartment(userId: string, data: CreateDepartmentDto) {
 
-   const user = await this.departmentRepository.findUser(userId);
+      const user = await this.departmentRepository.findUser(userId);
 
-   if(!user){
-      throw new Error("User not found");
+      if(!user){
+         throw new Error("User not found");
+      }
+
+      const department = await this.departmentRepository.createDepartment({
+         ...data,
+         created_by: user
+      });
+
+      return department;
+   };
+
+   async getAll(){
+      return await this.departmentRepository.getAll();
    }
 
-   const department = await this.departmentRepository.createDepartment({
-      ...data,
-      created_by: user
-   });
-
-   return department;
-}
+   async getById(department_id: string){
+      return await this.departmentRepository.getById(department_id);
+   }
 
    async updateDeparment(userId: string, department_id: string, data: UpdateDepartmentDto){
 
