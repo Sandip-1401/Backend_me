@@ -1,22 +1,39 @@
 import { AppError } from '../../common/errors/AppError';
 import { AppointmentStatusName } from '../../entities/appointment_status.entities';
 import { AppointmentRepository } from '../appointment/appointment.repository';
+import { DoctorRepository } from '../doctor/doctor.repository';
 import { CreateMedicalRecordDto } from './dto/createMedicalRecordDto';
 import { MedicalRecordRepository } from './medical-record.repository';
 
 export class MedicalRecordService {
   private medicalRecordRepository = new MedicalRecordRepository();
   private appointmentRepository = new AppointmentRepository();
-  async createRecord(data: CreateMedicalRecordDto) {
+  private doctorRepository = new DoctorRepository();
+
+  async createRecord(userId: string, data: CreateMedicalRecordDto) {
+
+    console.log(userId);
+    const doctor = await this.doctorRepository.findByUserId(userId);
+    console.log(doctor);
+    if(!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
+
     const appointment = await this.appointmentRepository.findById(data.appointment_id);
 
     if (!appointment) {
       throw new AppError('Appointment not found', 404, 'APPOINTMENT_NOT_FOUND');
     }
-
+    
     const existingRecord = await this.medicalRecordRepository.findByAppointment(
       data.appointment_id,
     );
+
+    if (appointment.doctor.doctor_id !== doctor.doctor_id) {
+      throw new AppError(
+        "You are not allowed to create record for this appointment",
+        403,
+        "FORBIDDEN"
+      );
+    }
 
     if (existingRecord) {
       throw new AppError(
@@ -26,9 +43,9 @@ export class MedicalRecordService {
       );
     }
 
-    if (appointment.status.status_name !== AppointmentStatusName.COMPLETED) {
+    if (appointment.status.status_name !== AppointmentStatusName.APPROVED) {
       throw new AppError(
-        'Medical record can only be created after appointment is completed',
+        'Medical record can only be created when appointment is approved',
         400,
         'APPOINTMENT_NOT_COMPLETED',
       );

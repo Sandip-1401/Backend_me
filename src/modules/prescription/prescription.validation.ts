@@ -12,5 +12,5 @@ export const createPrescriptionSchema = z.object({
   doctor_id: z.string().uuid(),
   patient_id: z.string().uuid(),
   notes: z.string().optional(),
-  medicines: z.array(prescriptionMedicineSchema).min(9),
+  medicines: z.array(prescriptionMedicineSchema).min(1),
 });

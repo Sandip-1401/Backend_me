@@ -45,6 +45,24 @@ export class PrescriptionRepository {
     });
   }
 
+
+  async findByDoctor(doctorId: string) {
+    return this.prescriptionRepository.find({
+      where: {
+        doctor: {doctor_id: doctorId}
+      },
+      relations: {
+        medicines: true,
+        doctor: true,
+        patient: true,
+        medical_record: true,
+      },
+      order: {
+        prescribed_date: 'DESC',
+      },
+    });
+  }
+
   async findById(prescriptionId: string) {
     return this.prescriptionRepository.findOne({
       where: {

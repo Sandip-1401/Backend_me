@@ -5,12 +5,19 @@ import { Prescription } from '../../entities/prescription.entities';
 import { PrescriptionMedicine } from '../../entities/prescription_medicine.entities';
 import { AppError } from '../../common/errors/AppError';
 import { MedicalRecord } from '../../entities/medical_records.entities';
+import { MedicalRecordRepository } from '../medical-record/medical-record.repository';
+import { DoctorRepository } from '../doctor/doctor.repository';
+import PatientRepository from '../patient/patient.repository';
 
 export class PrescriptionService {
   private prescriptionRepository = new PrescriptionRepository();
+  private doctorRepository = new DoctorRepository();
+  private patientRepository = new PatientRepository();
 
-  async createPrescription(data: CreatePrescriptionDto) {
+  async createPrescription(userId: string, data: CreatePrescriptionDto) {
+
     return await AppDataSource.transaction(async (manager) => {
+
       const prescriptionRepo = manager.getRepository(Prescription);
       const medicineRepo = manager.getRepository(PrescriptionMedicine);
       const medicalRecordRepo = manager.getRepository(MedicalRecord);
@@ -27,6 +34,19 @@ export class PrescriptionService {
         throw new AppError('Medical record not found', 404, 'MEDICAL_RECORD_NOT_FOUND');
       }
 
+      const doctor = await this.doctorRepository.findByUserId(userId);
+      console.log(doctor);
+      if(!doctor) throw new AppError("Doctor not found", 404, "DOCTOR_NOT_FOUND");
+
+      if(doctor.doctor_id !== medicalRecord?.doctor.doctor_id){
+        throw new AppError(
+          "You are not allowed to create prescription for this medical record",
+          403,
+          "FORBIDDEN"
+        );
+      }
+
+    
       const existingPrescription = await prescriptionRepo.findOne({
         where: {
           medical_record: {
@@ -74,8 +94,36 @@ export class PrescriptionService {
     return prescription;
   }
 
-  async getByPatient(patientId: string) {
+  async getByPatient(userId: string, patientId: string) {
+
     const prescriptions = await this.prescriptionRepository.findByPatient(patientId);
+
+    const patient = await this.patientRepository.findById(patientId);
+
+    if(patient?.user.user_id !== userId){
+      throw new AppError("You don't have permission for this", 400, "UNAUTHORIZED");
+    }
+
+    if (!prescriptions || prescriptions.length === 0) {
+      throw new AppError(
+        'No prescriptions found for this patient',
+        404,
+        'PATIENT_PRESCRIPTIONS_NOT_FOUND',
+      );
+    }
+
+    return prescriptions;
+  }
+
+  async getByDoctor(userId: string, doctorId: string) {
+
+    const prescriptions = await this.prescriptionRepository.findByDoctor(doctorId);
+
+    const doctor = await this.doctorRepository.findByDoctorId(doctorId);
+
+    if(doctor?.user.user_id !== userId){
+      throw new AppError("You don't have permission for this", 400, "UNAUTHORIZED");
+    }
 
     if (!prescriptions || prescriptions.length === 0) {
       throw new AppError(

@@ -16,8 +16,7 @@ export class MedicalRecordRepository {
         appointment: true,
         doctor: true,
         patient: true,
-      },
-      order: { record_date: 'DESC' },
+      }
     });
   }
 
