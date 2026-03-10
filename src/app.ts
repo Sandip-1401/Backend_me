@@ -14,6 +14,7 @@ import adminRoute from './modules/admin/admin.routes';
 import billingRoute from './modules/billing/billing.route';
 import paymentRoute from './modules/payment/payment.routes';
 import addressRoute from './modules/address/address.route';
+import departmentRoute from './modules/department/deparment.route';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/api/admin', adminRoute);
 app.use('/api/billing', billingRoute);
 app.use('/api/payment', paymentRoute)
 app.use('/api/address', addressRoute);
+app.use('/api/departments', departmentRoute);
 
 app.get('/', (req, res) => {
   res.status(200).json({
