@@ -20,12 +20,44 @@ export class AdminRepository {
     return user;
   }
 
-  async findUnverifiedUser() {
+  async findUnverifiedUser(
+    skip: number, 
+    limit: number, 
+    sort?: string, 
+    order: "ASC" | "DESC" = "ASC", 
+    search?: string
+  ): Promise<[User[], number]>{
+
+    const query = await this.userRepository
+      .createQueryBuilder("user")
+      .where("user.is_verified = :status", {status: false})
+
+      if(search){
+        query.andWhere(`(user.name ILIKE :search OR user.email ILIKE :search)`,{
+          search: `%${search}%`
+        });
+      }
+
+      const allowedSortFields = ['created_at'];
+
+      if(sort && allowedSortFields.includes(sort)){
+        query.orderBy(`user.${sort}`, order)
+      }else{
+        query.orderBy(`user.created_at`, "DESC")
+      }
+
     const users = await this.userRepository.find({
       where: { is_verified: false },
       order: { created_at: 'DESC' },
     });
-    return users;
+
+    query.distinct();
+
+    query.skip(skip).take(limit);
+
+    const [user, total] = await query.getManyAndCount();
+
+    return [user, total];
   }
 
   async verifiedUserById(userId: string, data: verifyUser) {
@@ -36,13 +68,55 @@ export class AdminRepository {
     return VerifiedUser;
   }
 
-  async findPendigDoctor() {
-    const doctors = await this.doctorRepository.find({
-      where: { status: DoctorStatus.PENDING },
-      relations: { user: true, department: true, address: true },
-      order: { created_at: 'ASC' },
-    });
-    return doctors;
+  async findPendigDoctor(
+    skip: number, 
+    limit: number, 
+    department?: string,
+    sort?: string, 
+    order: "ASC" | "DESC" = "ASC", 
+    search?: string
+  ): Promise<[Doctor[], number]>{
+
+    const query = this.doctorRepository
+      .createQueryBuilder("doctor")
+      .leftJoinAndSelect("doctor.user", "user")
+      .leftJoinAndSelect("doctor.department", "department")
+      .leftJoinAndSelect("doctor.address", "address")
+      // .leftJoinAndSelect("doctor.status", "status")
+      .where("doctor.status = :status", {status: DoctorStatus.PENDING})
+
+    if(department){
+      query.andWhere(`department.department_name = :department`, {
+        department
+      })
+    }
+
+    if(search){
+      query.andWhere(`(user.name ILIKE :search OR doctor.qualification ILIKE :search)`, {
+        search: `%${search}%`,
+      })
+    }
+
+    const allowedSortFields = ['experience_years', 'created_at'];
+    
+    if(sort && allowedSortFields.includes(sort)){
+      query.orderBy(`doctor.${sort}`, order)
+    }else{
+      query.orderBy('doctor.created_at', 'DESC');
+    }
+
+    query.distinct();
+
+    query.skip(skip).take(limit);
+
+    const [doctors, total] = await query.getManyAndCount();
+
+    // const doctors = await this.doctorRepository.find({
+    //   where: { status: DoctorStatus.PENDING },
+    //   relations: { user: true, department: true, address: true },
+    //   order: { created_at: 'ASC' },
+    // });
+    return [doctors, total];
   }
 
   async findPendingDoctorById(doctorId: string) {

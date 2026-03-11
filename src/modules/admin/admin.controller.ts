@@ -7,7 +7,7 @@ export class AdminController {
   private adminService = new AdminService();
 
   getPendingDoctors = async (req: AuthRequest, res: Response) => {
-    const doctors = await this.adminService.getPendingDoctors();
+    const doctors = await this.adminService.getPendingDoctors(req.query);
     return successResponse(res, 'Pending Doctors fetched...!', doctors);
   };
 
@@ -17,7 +17,7 @@ export class AdminController {
   };
 
   unverifiedUser = async (req: AuthRequest, res: Response) => {
-    const users = await this.adminService.getUnverifiedUser();
+    const users = await this.adminService.getUnverifiedUser(req.query);
     return successResponse(res, 'Unverified User', users);
   };
 

@@ -15,7 +15,7 @@ export class DepartmentController{
    };
 
    getAll = async (req: AuthRequest, res: Response) => {
-      const deparment = await this.departmentService.getAll();
+      const deparment = await this.departmentService.getAll(req.query);
       return successResponse(res,"Departments fetched successfully", deparment)
    }
 

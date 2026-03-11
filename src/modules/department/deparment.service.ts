@@ -1,3 +1,6 @@
+import { AppError } from "../../common/errors/AppError";
+import { buildPagination } from "../../utils/pagination-response.util";
+import { getPagination } from "../../utils/pagination.util";
 import { CreateDepartmentDto, UpdateDepartmentDto } from "./department.dto";
 import { DepartmentRepository } from "./department.repository";
 
@@ -20,8 +23,24 @@ export class DepartmentService{
       return department;
    };
 
-   async getAll(){
-      return await this.departmentRepository.getAll();
+   async getAll(query: any){
+
+      const {page, limit, skip} = getPagination(query);
+      
+          const department = query.department as string | undefined;
+      
+          const sort = query.sort as string | undefined;
+          const order = (query.order as "ASC" | "DESC") || "ASC";
+      
+          const search = query.search as string | undefined;
+      
+      const [departments, total] = await this.departmentRepository.getAll(skip, limit, department, sort, order, search);
+
+      if(departments.length = 0){
+         throw new AppError('Department not found', 404, 'DEPARTMENT_NOT_FOUND');
+      }
+
+      return buildPagination(department, total, page, limit)
    }
 
    async getById(department_id: string){

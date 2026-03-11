@@ -15,7 +15,7 @@ doctorRoute.get('/:id', authMiddleware,requireRole(["ADMIN","DOCTOR","PATIENT"])
 doctorRoute.post(
   '/',
   authMiddleware,
-  requireRole(["DOCTOR"]),
+  // requireRole(["DOCTOR"]),
   validate(createDoctorSchema),
   asyncHandler(doctorController.createDoctor),
 );
