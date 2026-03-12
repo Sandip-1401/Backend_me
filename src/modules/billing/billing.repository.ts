@@ -31,16 +31,16 @@ export class BillingRepository {
     });
   }
 
-  async findByBillId(billId: string){
-   return await this.billRepository.findOne({
-      where: {bill_id: billId},
-       relations: {
-         appointment: {
-            status: true
-         },
-         patient: true
-    }
-   })
+  async findByBillId(billId: string) {
+    return await this.billRepository.findOne({
+      where: { bill_id: billId },
+      relations: {
+        appointment: {
+          status: true,
+        },
+        patient: true,
+      },
+    });
   }
 
   async findById(prescriptionId: string) {

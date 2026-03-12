@@ -18,7 +18,7 @@ export class DoctorSchedulingController {
       max_patients: req.body.max_patients,
     });
 
-    return successResponse(res,'Doctor schedule created', schedule )
+    return successResponse(res, 'Doctor schedule created', schedule);
   };
 
   getDoctorSchedule = async (req: AuthRequest, res: Response) => {
@@ -26,7 +26,7 @@ export class DoctorSchedulingController {
 
     const schedules = await this.schedulingService.getDoctorSchedule(String(doctorId));
 
-    return successResponse(res,'Doctor schedule fetched', schedules)
+    return successResponse(res, 'Doctor schedule fetched', schedules);
   };
 
   updateSchedule = async (req: AuthRequest, res: Response) => {
@@ -34,8 +34,7 @@ export class DoctorSchedulingController {
 
     const updated = await this.schedulingService.updateSchedule(String(scheduleId), req.body);
 
-    return successResponse(res,'Doctor schedule updated successfully', updated)
-    
+    return successResponse(res, 'Doctor schedule updated successfully', updated);
   };
 
   deleteSchedule = async (req: AuthRequest, res: Response) => {
@@ -43,6 +42,6 @@ export class DoctorSchedulingController {
 
     await this.schedulingService.deleteSchedule(String(scheduleId));
 
-    return successResponse(res,'Doctor schedule delete successfully')
+    return successResponse(res, 'Doctor schedule delete successfully');
   };
 }

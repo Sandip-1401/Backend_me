@@ -14,7 +14,6 @@ export class PatientCntroller {
     const patient = await this.patientService.createPatient(data);
 
     return successResponse(res, 'Patient created Successfully', patient);
-
   };
 
   getAll = async (req: AuthRequest, res: Response) => {
@@ -25,13 +24,13 @@ export class PatientCntroller {
   getById = async (req: AuthRequest, res: Response) => {
     const patient_id = String(req.params.id);
     const patient = await this.patientService.findPatientById(patient_id);
-    return successResponse(res, 'Patient fetched Successfully', patient)
+    return successResponse(res, 'Patient fetched Successfully', patient);
   };
 
   getMyProfile = async (req: AuthRequest, res: Response) => {
     const user_id = String(req.user?.user_id);
     const myprofile = await this.patientService.findPatientByUserId(user_id);
-    return successResponse(res, 'Patient profile fetched Successfully', myprofile)
+    return successResponse(res, 'Patient profile fetched Successfully', myprofile);
   };
 
   cancleAppointment = async (req: AuthRequest, res: Response) => {
@@ -49,13 +48,13 @@ export class PatientCntroller {
 
     await this.patientService.updatePatient(patient_id, data);
 
-    return successResponse(res, 'Patient updated Successfully',)
+    return successResponse(res, 'Patient updated Successfully');
   };
 
   deletePatient = async (req: AuthRequest, res: Response) => {
     const patient_id = String(req.params.id);
 
     await this.patientService.deletePatient(patient_id);
-    return successResponse(res, 'Patient deleted Successfully',)
+    return successResponse(res, 'Patient deleted Successfully');
   };
 }

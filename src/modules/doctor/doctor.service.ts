@@ -247,6 +247,15 @@ export class DoctorService {
     if (!doctor) {
       throw new AppError('Doctor not found', 404, 'DOCTOR_NOT_FOUND');
     }
+
+    const role = await this.roleRepositry.findOne({
+      where: { role_name: 'DOCTOR' },
+    });
+
+    if (role) {
+      await this.userRoleRepository.deleteUserRole(doctor.user, role);
+    }
+
     return await this.doctorRepository.deleteDoctor(doctorId);
   }
 }

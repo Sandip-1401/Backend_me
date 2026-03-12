@@ -74,7 +74,7 @@ export class UserRoleService {
     return await this.userRoleRepository.findByUserAndRole(user1, role1);
   }
 
-  async revokeRole(userId: string, roleId: string) {
+  async deleteRole(userId: string, roleId: string) {
     const user = await this.userRepository.findOne({
       where: { user_id: userId },
     });
@@ -96,7 +96,8 @@ export class UserRoleService {
     if (!userRole) {
       throw new AppError('User role not found', 404, 'USER_ROLE_NOT_FOUND');
     }
-    return await this.userRoleRepository.deactiveUserRole(userRole);
+
+    return await this.userRoleRepository.deleteUserRole(user, role);
   }
 
   async getRolesByUser(userId: string) {

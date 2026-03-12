@@ -11,14 +11,14 @@ export class DoctorController {
     const user_id = req.user!.user_id;
     const doctor = await this.doctorService.createDoctor(user_id, req.body);
 
-    return successResponse(res, 'Doctor created successfully', doctor)
+    return successResponse(res, 'Doctor created successfully', doctor);
   };
 
   getMyProfile = async (req: AuthRequest, res: Response) => {
     const user_id = req.user!.user_id;
     const doctor = await this.doctorService.getDoctorByUserId(user_id);
 
-    return successResponse(res, 'Doctor fetched successfully', doctor)
+    return successResponse(res, 'Doctor fetched successfully', doctor);
   };
 
   getDoctorById = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -30,7 +30,7 @@ export class DoctorController {
 
   getAllDoctors = async (req: AuthRequest, res: Response) => {
     const doctors = await this.doctorService.getAllDoctors(req.query);
-    return successResponse(res, 'Doctors created successfully', doctors)
+    return successResponse(res, 'Doctors created successfully', doctors);
   };
 
   approveAppointment = async (req: AuthRequest, res: Response) => {
@@ -56,7 +56,7 @@ export class DoctorController {
 
     const { qualification, experience_years, consultation_fee, is_available, status } = req.body;
 
-    const data = { qualification, experience_years, consultation_fee, is_available, status};
+    const data = { qualification, experience_years, consultation_fee, is_available, status };
 
     const doctor = await this.doctorService.updateDoctorById(String(doctor_id), data);
 
@@ -64,8 +64,8 @@ export class DoctorController {
   };
 
   deleteDoctor = async (req: AuthRequest, res: Response) => {
-      const doctorId = req.params.id;
-      await this.doctorService.deleteDoctor(String(doctorId));
-      return successResponse(res, 'Doctor delete successfully');
+    const doctorId = req.params.id;
+    await this.doctorService.deleteDoctor(String(doctorId));
+    return successResponse(res, 'Doctor delete successfully');
   };
 }

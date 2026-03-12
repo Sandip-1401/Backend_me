@@ -21,30 +21,29 @@ export class AdminRepository {
   }
 
   async findUnverifiedUser(
-    skip: number, 
-    limit: number, 
-    sort?: string, 
-    order: "ASC" | "DESC" = "ASC", 
-    search?: string
-  ): Promise<[User[], number]>{
-
+    skip: number,
+    limit: number,
+    sort?: string,
+    order: 'ASC' | 'DESC' = 'ASC',
+    search?: string,
+  ): Promise<[User[], number]> {
     const query = await this.userRepository
-      .createQueryBuilder("user")
-      .where("user.is_verified = :status", {status: false})
+      .createQueryBuilder('user')
+      .where('user.is_verified = :status', { status: false });
 
-      if(search){
-        query.andWhere(`(user.name ILIKE :search OR user.email ILIKE :search)`,{
-          search: `%${search}%`
-        });
-      }
+    if (search) {
+      query.andWhere(`(user.name ILIKE :search OR user.email ILIKE :search)`, {
+        search: `%${search}%`,
+      });
+    }
 
-      const allowedSortFields = ['created_at'];
+    const allowedSortFields = ['created_at'];
 
-      if(sort && allowedSortFields.includes(sort)){
-        query.orderBy(`user.${sort}`, order)
-      }else{
-        query.orderBy(`user.created_at`, "DESC")
-      }
+    if (sort && allowedSortFields.includes(sort)) {
+      query.orderBy(`user.${sort}`, order);
+    } else {
+      query.orderBy(`user.created_at`, 'DESC');
+    }
 
     const users = await this.userRepository.find({
       where: { is_verified: false },
@@ -69,39 +68,38 @@ export class AdminRepository {
   }
 
   async findPendigDoctor(
-    skip: number, 
-    limit: number, 
+    skip: number,
+    limit: number,
     department?: string,
-    sort?: string, 
-    order: "ASC" | "DESC" = "ASC", 
-    search?: string
-  ): Promise<[Doctor[], number]>{
-
+    sort?: string,
+    order: 'ASC' | 'DESC' = 'ASC',
+    search?: string,
+  ): Promise<[Doctor[], number]> {
     const query = this.doctorRepository
-      .createQueryBuilder("doctor")
-      .leftJoinAndSelect("doctor.user", "user")
-      .leftJoinAndSelect("doctor.department", "department")
-      .leftJoinAndSelect("doctor.address", "address")
+      .createQueryBuilder('doctor')
+      .leftJoinAndSelect('doctor.user', 'user')
+      .leftJoinAndSelect('doctor.department', 'department')
+      .leftJoinAndSelect('doctor.address', 'address')
       // .leftJoinAndSelect("doctor.status", "status")
-      .where("doctor.status = :status", {status: DoctorStatus.PENDING})
+      .where('doctor.status = :status', { status: DoctorStatus.PENDING });
 
-    if(department){
+    if (department) {
       query.andWhere(`department.department_name = :department`, {
-        department
-      })
+        department,
+      });
     }
 
-    if(search){
+    if (search) {
       query.andWhere(`(user.name ILIKE :search OR doctor.qualification ILIKE :search)`, {
         search: `%${search}%`,
-      })
+      });
     }
 
     const allowedSortFields = ['experience_years', 'created_at'];
-    
-    if(sort && allowedSortFields.includes(sort)){
-      query.orderBy(`doctor.${sort}`, order)
-    }else{
+
+    if (sort && allowedSortFields.includes(sort)) {
+      query.orderBy(`doctor.${sort}`, order);
+    } else {
       query.orderBy('doctor.created_at', 'DESC');
     }
 

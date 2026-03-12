@@ -1,19 +1,20 @@
 import { successResponse } from '../../common/utils/successResponse';
+import { AuthRequest } from '../../middlewares/auth.middleware';
 import RoleService from './role.service';
 import { Request, Response } from 'express';
 
 export class RoleController {
   private roleService = new RoleService();
 
-  createRole = async (req: Request, res: Response) => {
+  createRole = async (req: AuthRequest, res: Response) => {
     const role = await this.roleService.createRole(req.body);
 
-    return successResponse(res, 'Role created Successfully', role)
+    return successResponse(res, 'Role created Successfully', role);
   };
 
-  getAllRole = async (req: Request, res: Response) => {
+  getAllRole = async (req: AuthRequest, res: Response) => {
     const roles = await this.roleService.getAllRole();
-    return successResponse(res, 'Role fetched Successfully', roles)
+    return successResponse(res, 'Role fetched Successfully', roles);
   };
 }
 export default RoleController;

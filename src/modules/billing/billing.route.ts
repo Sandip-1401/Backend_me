@@ -6,8 +6,78 @@ import { requireRole } from '../../middlewares/role.middleware';
 const router = Router();
 const billingController = new BillingController();
 
-router.post('/generate/:prescriptionId', authMiddleware, requireRole(["DOCTOR"]), billingController.generateBill);
+/**
+ * @swagger
+ * /api/billing/generate/{prescriptionId}:
+ *   post:
+ *     summary: Generate bill from prescription
+ *     description: Generate a bill for an appointment using a prescription ID. The bill includes medicine charges and applies discount logic. Only the DOCTOR who created the prescription can generate the bill.
+ *     tags:
+ *       - Billing
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: prescriptionId
+ *         required: true
+ *         description: Prescription ID used to generate the bill
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       201:
+ *         description: Bill generated successfully
+ *       400:
+ *         description: Bill already exists or prescription not found
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only the assigned DOCTOR can generate the bill
+ *       404:
+ *         description: Prescription not found
+ */
 
-router.get('/appointment/:appointmentId', authMiddleware, requireRole(["DOCTOR", "ADMIN", "PATIENT"]), billingController.getBillByAppointment);
+router.post(
+  '/generate/:prescriptionId',
+  authMiddleware,
+  requireRole(['DOCTOR']),
+  billingController.generateBill,
+);
+
+/**
+ * @swagger
+ * /api/billing/appointment/{appointmentId}:
+ *   get:
+ *     summary: Get bill by appointment
+ *     description: Retrieve the bill associated with a specific appointment using the appointment ID. Accessible by ADMIN, DOCTOR, or PATIENT.
+ *     tags:
+ *       - Billing
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: appointmentId
+ *         required: true
+ *         description: Appointment ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Bill fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Access denied for this role
+ *       404:
+ *         description: Bill not found for the appointment
+ */
+
+router.get(
+  '/appointment/:appointmentId',
+  authMiddleware,
+  requireRole(['DOCTOR', 'ADMIN', 'PATIENT']),
+  billingController.getBillByAppointment,
+);
 
 export default router;
