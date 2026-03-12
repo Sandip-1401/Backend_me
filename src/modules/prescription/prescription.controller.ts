@@ -20,8 +20,7 @@ export class PrescriptionController {
 
     const prescription = await this.prescriptionService.createPrescription(userId, data);
 
-    return successResponse(res, 'Prescription created successfully', prescription)
-  
+    return successResponse(res, 'Prescription created successfully', prescription);
   };
 
   getByMedicalRecord = async (req: AuthRequest, res: Response) => {
@@ -29,7 +28,7 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getByMedicalRecord(String(medicalRecordId));
 
-    return successResponse(res, 'Prescription fetched successfully', data)
+    return successResponse(res, 'Prescription fetched successfully', data);
   };
 
   getByPatient = async (req: AuthRequest, res: Response) => {
@@ -43,7 +42,7 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getByPatient(userId, String(patientId));
 
-    return successResponse(res, 'Prescription fetched successfully', data)
+    return successResponse(res, 'Prescription fetched successfully', data);
   };
 
   getByDoctoe = async (req: AuthRequest, res: Response) => {
@@ -57,7 +56,7 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getByDoctor(userId, String(doctorId));
 
-    return successResponse(res, 'Prescription fetched successfully', data)
+    return successResponse(res, 'Prescription fetched successfully', data);
   };
 
   getById = async (req: AuthRequest, res: Response) => {
@@ -65,6 +64,6 @@ export class PrescriptionController {
 
     const data = await this.prescriptionService.getById(String(prescriptionId));
 
-    return successResponse(res, 'Prescription fetched successfully', data)
+    return successResponse(res, 'Prescription fetched successfully', data);
   };
 }

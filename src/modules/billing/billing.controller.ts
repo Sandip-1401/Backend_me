@@ -12,8 +12,7 @@ export class BillingController {
 
     const bill = await this.billingService.generateBillFromPrescription(prescriptionId, userId);
 
-    return successResponse(res, 'Bill generated successfully', bill)
-
+    return successResponse(res, 'Bill generated successfully', bill);
   };
 
   getBillByAppointment = async (req: AuthRequest, res: Response) => {
@@ -21,6 +20,6 @@ export class BillingController {
 
     const bill = await this.billingService.getBillByAppointment(appointmentId);
 
-    return successResponse(res, 'Bill fetched successfully', bill)
+    return successResponse(res, 'Bill fetched successfully', bill);
   };
 }

@@ -18,7 +18,7 @@ export class AppointmentController {
 
     const appointment = await this.appointmentService.createAppointment(userId, data);
 
-    return successResponse(res, 'Appointment booked successfully', appointment)
+    return successResponse(res, 'Appointment booked successfully', appointment);
   };
 
   updateAppointment = async (req: AuthRequest, res: Response) => {
@@ -32,8 +32,7 @@ export class AppointmentController {
 
     const updated = await this.appointmentService.updateStatus(appointmentId, data, role);
 
-    return successResponse(res, 'Appointment updated successfully', updated)
-
+    return successResponse(res, 'Appointment updated successfully', updated);
   };
 
   getMyAppointments = async (req: AuthRequest, res: Response) => {
@@ -41,13 +40,13 @@ export class AppointmentController {
 
     const appointments = await this.appointmentService.getMyAppointments(userId);
 
-    return successResponse(res, 'Appointment fetched successfully', appointments)
+    return successResponse(res, 'Appointment fetched successfully', appointments);
   };
 
   getAll = async (req: AuthRequest, res: Response) => {
     const appointments = await this.appointmentService.getAllAppointments(req.query);
 
-    return successResponse(res, 'Appointment fetched successfully', appointments)
+    return successResponse(res, 'Appointment fetched successfully', appointments);
   };
 
   getAvailableSlots = async (req: AuthRequest, res: Response) => {
@@ -56,6 +55,6 @@ export class AppointmentController {
 
     const slots = await this.appointmentService.giveAvilableSlots(String(doctorId), date);
 
-    return successResponse(res, 'Available slots...', slots)
+    return successResponse(res, 'Available slots...', slots);
   };
 }

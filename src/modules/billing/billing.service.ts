@@ -10,7 +10,6 @@ export class BillingService {
   private doctorRepository = AppDataSource.getRepository(Doctor);
 
   async generateBillFromPrescription(prescriptionId: string, userId: string) {
-
     const prescription = await this.prescriptionRepository.findById(prescriptionId);
 
     if (!prescription) {
@@ -42,14 +41,14 @@ export class BillingService {
     let totalAmount = 0;
 
     let discount_amount = 0;
-    
+
     const billItems = medicines.map((medicine) => {
       const quantity = medicine.duration_days;
       const unitPrice = Number(medicine.unit_price || 0);
       const amount = quantity * unitPrice;
 
       totalAmount += amount;
-      discount_amount += amount/5;
+      discount_amount += amount / 5;
 
       return {
         item_type: 'MEDICINE',

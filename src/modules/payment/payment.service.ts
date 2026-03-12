@@ -1,24 +1,22 @@
-import { PaymentRepository } from "./payment.repository";
-import { QRUtil } from "../../utils/qr.util";
-import { BillStatus } from "../../entities/bill.entities";
-import { PaymentStatus } from "../../entities/payment.entities";
+import { PaymentRepository } from './payment.repository';
+import { QRUtil } from '../../utils/qr.util';
+import { BillStatus } from '../../entities/bill.entities';
+import { PaymentStatus } from '../../entities/payment.entities';
 
 export class PaymentService {
-
   private paymentRepository = new PaymentRepository();
 
   async generateQR(billId: string) {
-
     const bill = await this.paymentRepository.findBillById(billId);
-   
+
     if (!bill) {
-      throw new Error("Bill not found");
+      throw new Error('Bill not found');
     }
 
     const qr = await QRUtil.generateQR({
       billId: bill.bill_id,
       amount: bill?.total_amount,
-      type: "PAYMENT",
+      type: 'PAYMENT',
     });
 
     return {
@@ -29,23 +27,22 @@ export class PaymentService {
   }
 
   async payBill(billId: string, amount: number) {
-
     const bill = await this.paymentRepository.findBillById(billId);
 
     if (!bill) {
-      throw new Error("Bill not found");
+      throw new Error('Bill not found');
     }
 
-    if(amount !== Number(bill.net_amount)){
-      throw new Error("Invalid payment amount")
-      }
+    if (amount !== Number(bill.net_amount)) {
+      throw new Error('Invalid payment amount');
+    }
 
     const payment = await this.paymentRepository.createPayment({
       bill,
       patient: bill.patient,
       amount,
       transaction_id: `${new Date().getMilliseconds()}${String(Date.now())}${String(Date.now())}`,
-      payment_method: "QR",
+      payment_method: 'QR',
       payment_date: new Date(),
       status: PaymentStatus.SUCCESS,
     });

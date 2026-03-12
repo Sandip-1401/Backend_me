@@ -1,9 +1,8 @@
-import { AppDataSource } from "../../config/datasource";
-import { Payment } from "../../entities/payment.entities";
-import { Bill } from "../../entities/bill.entities";
+import { AppDataSource } from '../../config/datasource';
+import { Payment } from '../../entities/payment.entities';
+import { Bill } from '../../entities/bill.entities';
 
 export class PaymentRepository {
-
   private paymentRepository = AppDataSource.getRepository(Payment);
   private billRepository = AppDataSource.getRepository(Bill);
 

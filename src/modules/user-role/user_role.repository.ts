@@ -36,9 +36,11 @@ export class UserRoleRepository {
     });
   }
 
-  async deactiveUserRole(userRole: UserRole) {
-    userRole.is_active = false;
-    return this.userRoleRepository.save(userRole);
+  async deleteUserRole(user: User, role: Role) {
+    return await this.userRoleRepository.delete({
+      user: { user_id: user.user_id },
+      role: { role_id: role.role_id },
+    });
   }
 }
 
