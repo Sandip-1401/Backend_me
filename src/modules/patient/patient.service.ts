@@ -1,10 +1,12 @@
 import { AppError } from '../../common/errors/AppError';
+import { sendNotification } from '../../common/utils/sendNotification';
 import { AppDataSource } from '../../config/datasource';
 import { Appointment } from '../../entities/appointment.entities';
 import {
   AppointmentStatus,
   AppointmentStatusName,
 } from '../../entities/appointment_status.entities';
+import { NotificationType } from '../../entities/notification.entities';
 import { Role } from '../../entities/roles.entities';
 import { User } from '../../entities/user.entities';
 import { UserRole } from '../../entities/user_role.entities';
@@ -54,6 +56,19 @@ export class PatientService {
     }
 
     await this.userRoleRepository.assignRole(user, patientRole);
+
+
+    const admins = await this.userRoleRepository.findAdminUsers();
+    
+        for (const admin of admins) {
+          await sendNotification(
+            user.user_id,
+            admin.user.user_id,
+            `Role Patient`,
+            `New user ${user.name} choose role Patient`,
+            NotificationType.SYSTEM
+          );
+        }
 
     return patient;
   }

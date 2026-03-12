@@ -26,6 +26,28 @@ export class UserRoleRepository {
     });
   }
 
+  async findUsersByRole(roleId: string){
+    return await this.userRoleRepository.find({
+      where: {
+        role: {role_id: roleId},
+        is_active: true
+      },
+      relations: {
+        user: true
+      }
+    })
+  }
+
+  async findAdminUsers() {
+    return this.userRoleRepository
+      .createQueryBuilder("userRole")
+      .leftJoinAndSelect("userRole.user", "user")
+      .leftJoin("userRole.role", "role")
+      .where("role.role_name = :roleName", { roleName: "ADMIN" })
+      .andWhere("userRole.is_active = true")
+      .getMany();
+  }
+
   async getAllRolesByUser(user: User) {
     return this.userRoleRepository.find({
       where: {

@@ -1,16 +1,16 @@
 import { AppError } from '../../common/errors/AppError';
 import { AppDataSource } from '../../config/datasource';
+import { NotificationType } from '../../entities/notification.entities';
 import { RefreshToken } from '../../entities/refresh_token.entity';
-import RoleRepository from '../role/role.repository';
 import UserRoleRepository from '../user-role/user_role.repository';
 import { LoginDto, RegisterDto } from './auth.dto';
 import { AuthRepository } from './auth.repository';
 import bcrypt from 'bcrypt';
 import Jwt from 'jsonwebtoken';
+import { sendNotification } from '../../common/utils/sendNotification';
 
 export class AuthService {
   private authRepository = new AuthRepository();
-  private roleRepository = new RoleRepository();
   private userRoleRepository = new UserRoleRepository();
   private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
 
@@ -63,6 +63,19 @@ export class AuthService {
       password_hash: hashedPassword,
       phone_number: dto.phone_number,
     });
+
+   const admins = await this.userRoleRepository.findAdminUsers();
+
+    for (const admin of admins) {
+      await sendNotification(
+        user.user_id,
+        admin.user.user_id,
+        "New User Registered",
+        `New user ${user.name} has registered`,
+        NotificationType.SYSTEM
+      );
+    }
+
     return user;
   }
 

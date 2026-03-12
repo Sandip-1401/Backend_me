@@ -1,7 +1,9 @@
-import { PaymentRepository } from './payment.repository';
-import { QRUtil } from '../../utils/qr.util';
-import { BillStatus } from '../../entities/bill.entities';
-import { PaymentStatus } from '../../entities/payment.entities';
+import { PaymentRepository } from "./payment.repository";
+import { QRUtil } from "../../utils/qr.util";
+import { BillStatus } from "../../entities/bill.entities";
+import { PaymentStatus } from "../../entities/payment.entities";
+import { sendNotification } from "../../common/utils/sendNotification";
+import { NotificationType } from "../../entities/notification.entities";
 
 export class PaymentService {
   private paymentRepository = new PaymentRepository();
@@ -50,6 +52,15 @@ export class PaymentService {
     bill.status = BillStatus.PAID;
 
     await this.paymentRepository.saveBill(bill);
+
+    sendNotification(
+      String(bill.appointment?.doctor.doctor_id),
+      bill.patient.patient_id,
+      `Payment`,
+      `Payment successfully done by ${bill.patient.user.name}`,
+      NotificationType.PAYMENT,
+      payment.payment_id
+    )
 
     return payment;
   }

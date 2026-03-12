@@ -13,6 +13,8 @@ import { DayOfWeek } from '../../entities/doctor_scheduling.entities';
 import { AppError } from '../../common/errors/AppError';
 import { getPagination } from '../../utils/pagination.util';
 import { buildPagination } from '../../utils/pagination-response.util';
+import { sendNotification } from '../../common/utils/sendNotification';
+import { NotificationType } from '../../entities/notification.entities';
 
 export class AppointmentService {
   private appointmentRepository = new AppointmentRepository();
@@ -25,6 +27,9 @@ export class AppointmentService {
   async createAppointment(userId: string, data: CreateAppointmentDto) {
     const patient = await this.patientRepository.findOne({
       where: { user: { user_id: userId } },
+      relations: {
+        user: true
+      }
     });
     if (!patient) throw new AppError('Patient not found', 404, 'PATIENT_NOT_FOUND');
 
@@ -107,7 +112,7 @@ export class AppointmentService {
       throw new AppError('Appointment status is missing', 500, 'APPOINTMENT_STATUS_MISSING');
     }
 
-    return await this.appointmentRepository.createAppointment({
+    const appointment =  await this.appointmentRepository.createAppointment({
       patient,
       doctor,
       appointment_date: selectedDate,
@@ -115,6 +120,17 @@ export class AppointmentService {
       status: bookedStatus,
       reason: data.reason,
     });
+
+    await sendNotification(
+      patient.patient_id,
+      doctor.doctor_id,
+      `New Appointment`,
+      `You have new appointment form ${patient.user.name}`,
+      NotificationType.APPOINTMENT,
+      appointment.appointment_id
+    )
+
+    return appointment;
   }
 
   async giveAvilableSlots(doctorId: string, date: string) {
