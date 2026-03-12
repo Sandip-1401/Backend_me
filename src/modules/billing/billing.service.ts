@@ -3,6 +3,8 @@ import { PrescriptionRepository } from '../prescription/prescription.repository'
 import { BillStatus } from '../../entities/bill.entities';
 import { AppDataSource } from '../../config/datasource';
 import { Doctor } from '../../entities/doctor.entities';
+import { sendNotification } from '../../common/utils/sendNotification';
+import { NotificationType } from '../../entities/notification.entities';
 
 export class BillingService {
   private billingRepository = new BillingRepository();
@@ -58,6 +60,8 @@ export class BillingService {
         amount,
       };
     });
+    
+    doctor.consultation_fee ? totalAmount += doctor.consultation_fee : totalAmount += 0;
 
     const bill = await this.billingRepository.createBill({
       patient,
@@ -76,6 +80,15 @@ export class BillingService {
     }));
 
     await this.billingRepository.createBillItems(items);
+
+    sendNotification(
+      doctor.doctor_id,
+      patient.patient_id,
+      `Bill created`,
+      `Bill for the our last appointment is ready`,
+      NotificationType.PAYMENT,
+      bill.bill_id
+    )
 
     return {
       bill,

@@ -9,7 +9,7 @@ export class PrescriptionRepository {
   async createPrescription(data: Partial<Prescription>) {
     const prescription = this.prescriptionRepository.create(data);
     return await this.prescriptionRepository.save(prescription);
-  }
+  }//ye use nahi kiya...kyu ki vaha transaction se kam kar diya
 
   async createPresciptionMedicine(data: Partial<PrescriptionMedicine>[]) {
     const prescriptionMedicine = this.prescriptionMedicineRepository.create(data);

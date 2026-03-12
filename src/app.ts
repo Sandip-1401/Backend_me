@@ -5,7 +5,6 @@ import userRoleRoute from './modules/user-role/user-role.route';
 import doctorRoute from './modules/doctor/doctor.route';
 import patientRoute from './modules/patient/patient.route';
 import appointmentRoute from './modules/appointment/appointment.route';
-import { AppError } from './common/errors/AppError';
 import medicalRecordRoute from './modules/medical-record/medical_record.routes';
 import prescriptionRoute from './modules/prescription/prescription.routes';
 import scheduleRoute from './modules/doctor-scheduling/doctorScheduling.routes';
@@ -15,6 +14,7 @@ import billingRoute from './modules/billing/billing.route';
 import paymentRoute from './modules/payment/payment.routes';
 import addressRoute from './modules/address/address.route';
 import departmentRoute from './modules/department/deparment.route';
+import notificationRoute from './modules/notification/notification.route';
 
 const app = express();
 
@@ -34,6 +34,7 @@ app.use('/api/billing', billingRoute);
 app.use('/api/payment', paymentRoute)
 app.use('/api/address', addressRoute);
 app.use('/api/departments', departmentRoute);
+app.use('/api/notifications', notificationRoute)
 
 app.get('/', (req, res) => {
   res.status(200).json({

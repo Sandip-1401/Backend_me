@@ -15,6 +15,8 @@ import {
   AppointmentStatus,
   AppointmentStatusName,
 } from '../../entities/appointment_status.entities';
+import { sendNotification } from '../../common/utils/sendNotification';
+import { NotificationType } from '../../entities/notification.entities';
 
 const ALLOWED_UPDATE_FIELDS = [
   'qualification',
@@ -156,9 +158,20 @@ export class DoctorService {
       throw new AppError('Approved status not found', 404, 'STATUS_NOT_FOUND');
     }
 
-    return await this.doctorRepository.updateAppointmentStatus(appointmentId, {
+    const approvedappointment =  await this.doctorRepository.updateAppointmentStatus(appointmentId, {
       status: approvedStatus,
     });
+
+    sendNotification(
+      doctor.doctor_id,
+      appointment.patient.patient_id,
+      `Appointment approved`,
+      `Your appointment for Dr. ${doctor.user.name} is approved`,
+      NotificationType.APPOINTMENT,
+      appointment.appointment_id
+    )
+
+    return approvedappointment;
   }
 
   async rejectAppointment(userId: string, appointmentId: string) {
@@ -192,9 +205,20 @@ export class DoctorService {
       throw new AppError('Cancelled status not found', 404, 'STATUS_NOT_FOUND');
     }
 
-    return await this.doctorRepository.updateAppointmentStatus(appointmentId, {
+    const rejectedAppointment =  await this.doctorRepository.updateAppointmentStatus(appointmentId, {
       status: cancelledStatus,
     });
+
+    sendNotification(
+      doctor.doctor_id,
+      appointment.patient.patient_id,
+      `Appointment rejected`,
+      `Your appointment for Dr. ${doctor.user.name} is reject`,
+      NotificationType.APPOINTMENT,
+      appointment.appointment_id
+    )
+
+    return rejectedAppointment;
   }
 
   async updateDoctorById(doctorId: string, data: Partial<Doctor>) {

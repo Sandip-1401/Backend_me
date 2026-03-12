@@ -8,6 +8,8 @@ import { MedicalRecord } from '../../entities/medical_records.entities';
 import { MedicalRecordRepository } from '../medical-record/medical-record.repository';
 import { DoctorRepository } from '../doctor/doctor.repository';
 import PatientRepository from '../patient/patient.repository';
+import { sendNotification } from '../../common/utils/sendNotification';
+import { NotificationType } from '../../entities/notification.entities';
 
 export class PrescriptionService {
   private prescriptionRepository = new PrescriptionRepository();
@@ -15,7 +17,9 @@ export class PrescriptionService {
   private patientRepository = new PatientRepository();
 
   async createPrescription(userId: string, data: CreatePrescriptionDto) {
+
     return await AppDataSource.transaction(async (manager) => {
+
       const prescriptionRepo = manager.getRepository(Prescription);
       const medicineRepo = manager.getRepository(PrescriptionMedicine);
       const medicalRecordRepo = manager.getRepository(MedicalRecord);
@@ -25,6 +29,7 @@ export class PrescriptionService {
         relations: {
           doctor: true,
           patient: true,
+          appointment: true
         },
       });
 
@@ -77,6 +82,15 @@ export class PrescriptionService {
       }));
 
       await medicineRepo.save(medicines);
+
+      sendNotification(
+          doctor.doctor_id,
+          medicalRecord.patient.patient_id,
+          `Prescription created`,
+          `Your prescription for our appointment is ready`,
+          NotificationType.APPOINTMENT,
+          prescription.prescription_id
+      )
 
       return prescription;
     });
