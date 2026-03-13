@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './auth.dto';
+import { LoginDto, RegisterDto, VerifyOTPDto } from './auth.dto';
 import { successResponse } from '../../common/utils/successResponse';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 
@@ -22,8 +22,27 @@ export const login = async (req: AuthRequest, res: Response) => {
 export const register = async (req: AuthRequest, res: Response) => {
   const dto: RegisterDto = req.body;
   const user = await authService.register(dto);
-  return successResponse(res, 'User Register Successfully!', user);
+  return successResponse(res, "OTP sent to your email", user);
 };
+
+export const verifyOtp = async (req: Request, res: Response) => {
+
+  const dto: VerifyOTPDto = req.body;
+
+  const result = await authService.verifyOtp(dto);
+
+  return successResponse(res, "User Registered Successfully!", result);
+
+};
+
+export const resendOtp = async (req: AuthRequest, res: Response) => {
+  
+  const {email} = req.body;
+
+  const result = await authService.resendOtp(email);
+
+  return successResponse(res, "OTP sent successfully", result)
+}
 
 export const refreshToken = async (req: AuthRequest, res: Response) => {
   const { refreshToken } = req.body;

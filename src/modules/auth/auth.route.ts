@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, refreshToken, register, logout } from './auth.controller';
+import { login, refreshToken, register, logout, verifyOtp, resendOtp } from './auth.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { validate } from '../../middlewares/validate.middleware';
 import { loginSchema, registerSchema } from './auth.validation';
@@ -132,6 +132,86 @@ authRoute.post('/refresh-token', asyncHandler(refreshToken));
  */
 
 authRoute.post('/logout', authMiddleware, asyncHandler(logout));
+
+/**
+ * @swagger
+ * /api/auth/verify-otp:
+ *   post:
+ *     summary: Verify OTP
+ *     description: Register user by verifying OTP sent in your email.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       description: User OTP verification 
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Full name of the user
+ *                 example: Sandip Sonagra
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email address of the user
+ *                 example: sandip@example.com
+ *               password:
+ *                 type: string
+ *                 description: User account password (minimum 6 characters)
+ *                 example: password123
+ *               phone_number:
+ *                 type: string
+ *                 description: User phone number (10 digits)
+ *                 example: "9876543210"
+ *               otp:
+ *                 type: string
+ *                 description: User OTP (6 digits)
+ *                 example: "987654"
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ *       401:
+ *         description: Invalid OTP
+ */
+
+authRoute.post(
+  "/verify-otp",
+  asyncHandler(verifyOtp)
+);
+
+/**
+ * @swagger
+ * /api/auth/resend-otp:
+ *   post:
+ *     summary: Resend OTP
+ *     description: Resend OTP to email.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       description: Resend OTP to email. 
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email address of the user
+ *                 example: sandip@example.com
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ *       401:
+ *         description: Invalid OTP
+ */
+
+
+authRoute.post("/resend-otp", asyncHandler(resendOtp));
 
 authRoute.get('/test', authMiddleware, (req, res) => {
   res.status(200).json({

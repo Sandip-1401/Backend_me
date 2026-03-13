@@ -3,16 +3,20 @@ import { AppDataSource } from '../../config/datasource';
 import { NotificationType } from '../../entities/notification.entities';
 import { RefreshToken } from '../../entities/refresh_token.entity';
 import UserRoleRepository from '../user-role/user_role.repository';
-import { LoginDto, RegisterDto } from './auth.dto';
+import { LoginDto, RegisterDto, VerifyOTPDto } from './auth.dto';
 import { AuthRepository } from './auth.repository';
 import bcrypt from 'bcrypt';
 import Jwt from 'jsonwebtoken';
 import { sendNotification } from '../../common/utils/sendNotification';
+import { OtpService } from "../otp/otp.service";
+import { EmailService } from '../../common/services/email.service';
 
 export class AuthService {
   private authRepository = new AuthRepository();
   private userRoleRepository = new UserRoleRepository();
   private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+  private otpService = new OtpService();
+  private emailService = new EmailService();
 
   async login(dto: LoginDto) {
     const user = await this.authRepository.findByEmail(dto.email);
@@ -50,9 +54,58 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
+
     const existingUser = await this.authRepository.findByEmail(dto.email);
+
     if (existingUser) {
-      throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+      throw new AppError('Email already exists', 401, 'EMAIL_EXISTS');
+    }
+
+    const otp = await this.otpService.createOTP(dto.email);
+
+    await this.emailService.sendOTP(dto.email, otp);
+
+    return {
+      message: "OTP sent to your email"
+    };
+
+    // const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // const user = await this.authRepository.createUser({
+    //   name: dto.name,
+    //   email: dto.email,
+    //   password_hash: hashedPassword,
+    //   phone_number: dto.phone_number,
+    // });
+
+    //  const admins = await this.userRoleRepository.findAdminUsers();
+
+    //   for (const admin of admins) {
+    //     await sendNotification(
+    //       user.user_id,
+    //       admin.user.user_id,
+    //       "New User Registered",
+    //       `New user ${user.name} has registered`,
+    //       NotificationType.SYSTEM
+    //     );
+    //   }
+
+    // return user;
+  };
+
+
+  async verifyOtp(dto: VerifyOTPDto) {
+
+    const isValid = await this.otpService.verifyOTP(dto.email, dto.otp);
+
+    if (!isValid) {
+      throw new AppError("Invalid or expired OTP", 400, "INVALID_OTP");
+    }
+
+    const existingUser = await this.authRepository.findByEmail(dto.email);
+
+    if (existingUser) {
+      throw new AppError("Email already exists", 400, "EMAIL_EXISTS");
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -64,7 +117,9 @@ export class AuthService {
       phone_number: dto.phone_number,
     });
 
-   const admins = await this.userRoleRepository.findAdminUsers();
+    await this.otpService.deleteOTP(dto.email);
+
+    const admins = await this.userRoleRepository.findAdminUsers();
 
     for (const admin of admins) {
       await sendNotification(
@@ -77,6 +132,29 @@ export class AuthService {
     }
 
     return user;
+
+  }
+
+  async resendOtp(email: string){
+    const existingOtp = await this.otpService.findByEmail(email);
+
+    if(!existingOtp)  throw new AppError("OTP request not found", 404, "OTP_NOT_FOUND");
+
+    const diff = Date.now() - new Date(existingOtp.created_at).getTime();
+
+    if(diff < 60000){
+       throw new AppError(
+        "Please wait before requesting another OTP",
+        400,
+        "OTP_COOLDOWN"
+      );
+    }
+
+    const newOtp = await this.otpService.createOTP(email);
+
+    await this.emailService.sendOTP(email, newOtp);
+
+    return {email};
   }
 
   async refreshAccessToken(refreshToken: string) {

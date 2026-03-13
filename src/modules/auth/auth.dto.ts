@@ -9,3 +9,11 @@ export interface RegisterDto {
   password: string;
   phone_number?: string;
 }
+
+export interface VerifyOTPDto extends RegisterDto{
+  otp: string
+}
+
+export interface ResendOtpdto{
+  email: string
+}
