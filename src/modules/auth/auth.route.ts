@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middlewares/auth.middleware';
 import { validate } from '../../middlewares/validate.middleware';
 import { loginSchema, registerSchema } from './auth.validation';
 import { asyncHandler } from '../../common/utils/asyncHandler';
+import { loginLimiter, otpLimiter } from '../../middlewares/rateLimit.middleware';
 
 const authRoute = Router();
 
@@ -41,7 +42,7 @@ const authRoute = Router();
  *       401:
  *         description: Invalid email or password
  */
-authRoute.post('/login', validate(loginSchema), asyncHandler(login));
+authRoute.post('/login', loginLimiter , validate(loginSchema), asyncHandler(login));
 
 /**
  * @swagger
@@ -83,7 +84,7 @@ authRoute.post('/login', validate(loginSchema), asyncHandler(login));
  *         description: Validation error
  */
 
-authRoute.post('/register', validate(registerSchema), asyncHandler(register));
+authRoute.post('/register', otpLimiter,  validate(registerSchema), asyncHandler(register));
 
 /**
  * @swagger
@@ -179,6 +180,7 @@ authRoute.post('/logout', authMiddleware, asyncHandler(logout));
 
 authRoute.post(
   "/verify-otp",
+  otpLimiter,
   asyncHandler(verifyOtp)
 );
 
@@ -210,7 +212,7 @@ authRoute.post(
  *         description: Invalid OTP
  */
 
-authRoute.post("/resend-otp", asyncHandler(resendOtp));
+authRoute.post("/resend-otp", otpLimiter, asyncHandler(resendOtp));
 
 /**
  * @swagger
@@ -242,7 +244,7 @@ authRoute.post("/resend-otp", asyncHandler(resendOtp));
  *         description: Validation error
  */
 
-authRoute.post("/forgot-password", asyncHandler(forgotPassward))
+authRoute.post("/forgot-password", otpLimiter, asyncHandler(forgotPassward))
 
 /**
  * @swagger

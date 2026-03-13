@@ -17,10 +17,13 @@ import paymentRoute from './modules/payment/payment.routes';
 import addressRoute from './modules/address/address.route';
 import departmentRoute from './modules/department/deparment.route';
 import notificationRoute from './modules/notification/notification.route';
+import { apiLimiter } from './middlewares/rateLimit.middleware';
 
 const app = express();
 
 app.use(express.json());
+
+app.use(apiLimiter);
 
 app.use('/api/auth', authRoute);
 app.use('/api/roles', roleRoute);
@@ -47,5 +50,4 @@ app.get('/', (req, res) => {
 });
 
 app.use(errorMiddleware);
-
 export default app;
