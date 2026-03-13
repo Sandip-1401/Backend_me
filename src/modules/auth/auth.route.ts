@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, refreshToken, register, logout, verifyOtp, resendOtp } from './auth.controller';
+import { login, refreshToken, register, logout, verifyOtp, resendOtp, forgotPassward, verifyResetPasswordOtp, resetPassword } from './auth.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { validate } from '../../middlewares/validate.middleware';
 import { loginSchema, registerSchema } from './auth.validation';
@@ -210,8 +210,116 @@ authRoute.post(
  *         description: Invalid OTP
  */
 
-
 authRoute.post("/resend-otp", asyncHandler(resendOtp));
+
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Forgot password
+ *     description: Send OTP to user's registered email for password reset.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       description: User email to receive OTP
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Registered email of the user
+ *                 example: sandip@example.com
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ *       404:
+ *         description: User not found
+ *       400:
+ *         description: Validation error
+ */
+
+authRoute.post("/forgot-password", asyncHandler(forgotPassward))
+
+/**
+ * @swagger
+ * /api/auth/verify-reset-password-otp:
+ *   post:
+ *     summary: Verify password reset OTP
+ *     description: Verify OTP sent to user's email before allowing password reset.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       description: Email and OTP for verification
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Registered email of the user
+ *                 example: sandip@example.com
+ *               otp:
+ *                 type: string
+ *                 description: OTP received on email
+ *                 example: "482931"
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully
+ *       400:
+ *         description: Invalid OTP
+ *       404:
+ *         description: OTP not found
+ */
+
+authRoute.post("/verify-reset-password-otp", asyncHandler(verifyResetPasswordOtp))
+//if error check for otp type you know...!!
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Reset user password
+ *     description: Reset password after OTP verification.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       description: New password details
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Registered email of the user
+ *                 example: sandip@example.com
+ *               password:
+ *                 type: string
+ *                 description: New password
+ *                 example: newpassword123
+ *               confirmPassword:
+ *                 type: string
+ *                 description: Confirm new password
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *       400:
+ *         description: Password mismatch or validation error
+ *       404:
+ *         description: User not found
+ */
+
+authRoute.post("/reset-password", asyncHandler(resetPassword))
 
 authRoute.get('/test', authMiddleware, (req, res) => {
   res.status(200).json({

@@ -10,11 +10,14 @@ import Jwt from 'jsonwebtoken';
 import { sendNotification } from '../../common/utils/sendNotification';
 import { OtpService } from "../otp/otp.service";
 import { EmailService } from '../../common/services/email.service';
+import { OtpType } from '../../entities/otp-verification.entities';
+import { User } from '../../entities/user.entities';
 
 export class AuthService {
   private authRepository = new AuthRepository();
   private userRoleRepository = new UserRoleRepository();
   private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+  private userRepository = AppDataSource.getRepository(User);
   private otpService = new OtpService();
   private emailService = new EmailService();
 
@@ -61,7 +64,7 @@ export class AuthService {
       throw new AppError('Email already exists', 401, 'EMAIL_EXISTS');
     }
 
-    const otp = await this.otpService.createOTP(dto.email);
+    const otp = await this.otpService.createOTP(dto.email, OtpType.REGISTER);
 
     await this.emailService.sendOTP(dto.email, otp);
 
@@ -150,11 +153,74 @@ export class AuthService {
       );
     }
 
-    const newOtp = await this.otpService.createOTP(email);
+    const newOtp = await this.otpService.createOTP(email, OtpType.REGISTER);
 
     await this.emailService.sendOTP(email, newOtp);
 
     return {email};
+  };
+  
+  async forgotPassward(email: string){
+    const user = await this.authRepository.findByEmail(email);
+
+    if(!user) throw new AppError(`${email} is not registered yet`, 400, "EMAIL_NOT_REGISTERD");
+
+    const otp = await this.otpService.createOTP(email, OtpType.PASSWORD_RESET);
+
+    await this.emailService.sendOTP(email, otp);
+
+    return {
+      message: `Please verify your email first before change password`
+    }
+
+  }
+
+  async verifyResetPasswordOtp(email: string, otp: string, type: OtpType){
+    console.log(`enter verifyResetPasswordOtp`)
+    const user = await this.authRepository.findByEmail(email);
+
+    if(!user) throw new AppError("Email not found", 404, "EMAIL_NOT_FOUND");
+
+    const isValid = await this.otpService.verifyOTP(email, otp);
+
+    if(!isValid) throw new AppError("Invalid or expired OTP", 400, "INVALID_OTP");
+
+    await this.otpService.isVerifyTrue(email, otp, type);
+     console.log(`exit verifyResetPasswordOtp`)
+    return {
+      message: `Enterd otp is valis, now you can change your password`
+    }
+  };
+
+  async resetPassword(email: string, password: string, confirmPassword: string){
+
+    const otpEmail = await this.otpService.findByEmail(email);
+
+    if(!otpEmail) throw new AppError("Email not found", 404, "EMAIL_NOT_FOUND");
+
+    if(!otpEmail.is_verified){
+      throw new AppError(`For ${email} otp is not verified, Please verify by new OTP again`, 400, "OTP_NOT_VERIFIED")
+    }
+
+    const user = await this.userRepository.findOne({
+      where: {email: email}
+    });
+
+    if(!user) throw new AppError("User is not regstered", 400, "USER_NOT_REGISTERED");
+
+    if(password !== confirmPassword){
+      throw new AppError("Password and confirm password does not match", 400, "PASSWORD_AND_CONFIRMPASSWORD_DOES_NOT_MATCH");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const updatedUser = await this.authRepository.updateUserPassword(email, {
+      password_hash: hashedPassword
+    });
+
+    await this.otpService.deleteOTP(email);
+    
+    return updatedUser;
   }
 
   async refreshAccessToken(refreshToken: string) {

@@ -1,3 +1,5 @@
+import { AppError } from "../../common/errors/AppError";
+import { OtpType } from "../../entities/otp-verification.entities";
 import { OtpRepository } from "./otp.repository";
 
 export class OtpService {
@@ -8,7 +10,7 @@ export class OtpService {
       return Math.floor(100000 + Math.random() * 900000).toString();
    }
 
-   async createOTP(email: string) {
+   async createOTP(email: string, type: OtpType) {
 
       const otp: string = this.generateOTP();
 
@@ -18,8 +20,10 @@ export class OtpService {
 
       if (existing) {
          existing.otp = otp,
-            existing.expires_at = expiresAt;
-
+         existing.expires_at = expiresAt;
+         if(existing.type){
+            existing.type = type;
+         }
          await this.otpRepository.saveOTP(existing)
          return otp;
       }
@@ -27,13 +31,16 @@ export class OtpService {
       await this.otpRepository.createOTP({
          email,
          otp,
-         expires_at: expiresAt
+         expires_at: expiresAt,
+         type: type
       });
 
       return otp;
    };
 
    async verifyOTP(email: string, otp: string) {
+     console.log(`enter verifyOTP`)
+
       const record = await this.otpRepository.findByEmail(email);
 
       if (!record) {
@@ -53,6 +60,22 @@ export class OtpService {
 
    async findByEmail(email: string) {
       return await this.otpRepository.findByEmail(email);
+   }
+
+   async isVerifyTrue(email: string, otp: string, type: OtpType){
+      console.log(`enter isVerifyTrue`)
+
+      const otpRow = await this.otpRepository.findByEmailAndOtp(email, otp, type);
+
+      if(!otpRow){
+         throw new AppError(`${otp} for ${email} not found`, 404, "OTP-EMAIL_NOT_FOUND")
+      }
+
+      otpRow.is_verified = true;
+
+      const verifiedOTPRow = await this.otpRepository.updateOtpIsVerify(email, otpRow)
+
+      return {verifiedOTPRow, message: "marked as verified once"}
    }
 
 

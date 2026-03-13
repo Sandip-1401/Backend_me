@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, VerifyOTPDto } from './auth.dto';
 import { successResponse } from '../../common/utils/successResponse';
 import { AuthRequest } from '../../middlewares/auth.middleware';
+import { OtpType } from '../../entities/otp-verification.entities';
 
 const authService = new AuthService();
 
@@ -37,11 +38,41 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
 export const resendOtp = async (req: AuthRequest, res: Response) => {
   
-  const {email} = req.body;
+  const { email } = req.body;
 
   const result = await authService.resendOtp(email);
 
   return successResponse(res, "OTP sent successfully", result)
+};
+
+export const forgotPassward = async (req: AuthRequest, res: Response) => {
+
+  const { email } = req.body;
+
+  const result = await authService.forgotPassward(email);
+
+  return successResponse(res, "OTP sent your registered email", result);
+};
+
+export const verifyResetPasswordOtp = async (req: AuthRequest, res: Response) => {
+  console.log(`enter controller`)
+  const email = String(req.body.email);
+  const otp = String(req.body.otp);
+
+  const result = await authService.verifyResetPasswordOtp(email, otp, OtpType.PASSWORD_RESET);
+
+  return successResponse(res, "OTP verified now you can reset you password", result);
+}
+
+export const resetPassword = async (req: AuthRequest, res: Response) => {
+
+  const email = String(req.body.email);
+  const password = String(req.body.password);
+  const confirmPassword = String(req.body.confirmPassword)
+
+  const result = await authService.resetPassword(email, password, confirmPassword);
+
+  return successResponse(res, "Password reset successfully", result)
 }
 
 export const refreshToken = async (req: AuthRequest, res: Response) => {

@@ -5,6 +5,11 @@ import {
   CreateDateColumn
 } from "typeorm";
 
+export enum OtpType {
+  REGISTER = "REGISTER",
+  PASSWORD_RESET = "PASSWORD_RESET"
+}
+
 @Entity("otp_verifications")
 export class OtpVerification {
 
@@ -16,6 +21,15 @@ export class OtpVerification {
 
   @Column({ type: "varchar", length: 6 })
   otp!: string;
+
+  @Column({
+    type: "enum",
+    enum: OtpType
+  })
+  type!: OtpType;
+
+  @Column({type: "boolean", default: false})
+  is_verified!: boolean;
 
   @Column({ type: "timestamp" })
   expires_at!: Date;
