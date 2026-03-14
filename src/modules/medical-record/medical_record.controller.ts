@@ -46,7 +46,8 @@ export class MedicalRecordController {
   };
 
   getAllRecords = async (req: AuthRequest, res: Response) => {
-    const record = await this.medicalRecordService.getAllAppointment();
+
+    const record = await this.medicalRecordService.getAllAppointment(req.query);
 
     return successResponse(res, 'All records...', record);
   };

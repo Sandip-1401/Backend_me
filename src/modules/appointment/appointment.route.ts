@@ -70,7 +70,7 @@ appointmentRoute.get(
   '/',
   authMiddleware,
   requireRole(['ADMIN']),
-  asyncHandler(appointmentController.getAll),
+  asyncHandler(appointmentController.getAll), //FSSP done
 );
 
 /**

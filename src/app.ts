@@ -33,10 +33,10 @@ app.use('/api/patients', patientRoute);
 app.use('/api/appointments', appointmentRoute);
 app.use('/api/medical-records', medicalRecordRoute);
 app.use('/api/prescriptions', prescriptionRoute);
-app.use('/api/schedule', scheduleRoute);
+app.use('/api/schedules', scheduleRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/billing', billingRoute);
-app.use('/api/payment', paymentRoute);
+app.use('/api/payments', paymentRoute);
 app.use('/api/address', addressRoute);
 app.use('/api/departments', departmentRoute);
 app.use('/api/notifications', notificationRoute)

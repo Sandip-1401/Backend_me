@@ -47,7 +47,7 @@ paymentRoute.get(
  * /api/payments/pay/{billId}:
  *   post:
  *     summary: Pay bill
- *     description: Process payment for a bill using the bill ID. Only users with the PATIENT role are allowed to pay the bill.
+ *     description: Allows a patient to pay a bill using the bill ID. Only users with the PATIENT role can make the payment.
  *     tags:
  *       - Payments
  *     security:
@@ -56,21 +56,32 @@ paymentRoute.get(
  *       - in: path
  *         name: billId
  *         required: true
- *         description: Bill ID to be paid
+ *         description: Bill ID for which the payment will be made
  *         schema:
  *           type: string
  *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - amount
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 example: 500
  *     responses:
  *       200:
- *         description: Bill paid successfully
+ *         description: Payment completed successfully
  *       401:
  *         description: Unauthorized - JWT token missing or invalid
  *       403:
- *         description: Forbidden - Only PATIENT can pay the bill
+ *         description: Forbidden - Only PATIENT can make payment
  *       404:
  *         description: Bill not found
  */
-
 paymentRoute.post(
   '/pay/:billId',
   authMiddleware,

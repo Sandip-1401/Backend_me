@@ -10,8 +10,13 @@ export class PaymentRepository {
     return this.billRepository.findOne({
       where: { bill_id: billId },
       relations: {
-        patient: true,
-        appointment: true,
+        patient: {
+          user: true
+        },
+        appointment: {
+          doctor: true
+        },
+        
       },
     });
   }

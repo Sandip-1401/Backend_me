@@ -31,7 +31,7 @@ adminRoute.get(
   '/pending-doctors',
   authMiddleware,
   requireRole(['ADMIN', 'SUPER ADMIN']),
-  asyncHandler(adminController.getPendingDoctors),
+  asyncHandler(adminController.getPendingDoctors), //FSSP done
 );
 
 /**
@@ -93,7 +93,7 @@ adminRoute.get(
   '/unverified-users',
   authMiddleware,
   requireRole(['ADMIN', 'SUPER ADMIN']),
-  asyncHandler(adminController.unverifiedUser),
+  asyncHandler(adminController.unverifiedUser), //FSSP done
 );
 
 /**

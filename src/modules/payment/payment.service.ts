@@ -17,7 +17,7 @@ export class PaymentService {
 
     const qr = await QRUtil.generateQR({
       billId: bill.bill_id,
-      amount: bill?.total_amount,
+      amount: bill?.net_amount,
       type: 'PAYMENT',
     });
 
@@ -52,7 +52,6 @@ export class PaymentService {
     bill.status = BillStatus.PAID;
 
     await this.paymentRepository.saveBill(bill);
-
     sendNotification(
       String(bill.appointment?.doctor.doctor_id),
       bill.patient.patient_id,

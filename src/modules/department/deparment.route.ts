@@ -31,7 +31,7 @@ departmentRoute.get(
   '/',
   authMiddleware,
   requireRole(['ADMIN']),
-  asyncHandler(deparmentController.getAll),
+  asyncHandler(deparmentController.getAll), //FSSP done
 );
 
 /**

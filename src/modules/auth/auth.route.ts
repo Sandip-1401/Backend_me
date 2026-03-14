@@ -28,12 +28,12 @@ const authRoute = Router();
  *                 type: string
  *                 format: email
  *                 description: Registered user email
- *                 example: admin@system.com
+ *                 example: sandipsongra14@gmail.com
  *               password:
  *                 type: string
  *                 format: password
  *                 description: User account password
- *                 example: Admin@123
+ *                 example: S@ndip14
  *     responses:
  *       200:
  *         description: Login successful and JWT token returned
@@ -120,16 +120,38 @@ authRoute.post('/refresh-token', asyncHandler(refreshToken));
  * /api/auth/logout:
  *   post:
  *     summary: Logout user
- *     description: Logout the currently authenticated user by invalidating their session or token.
- *     tags:
- *       - Auth
+ *     description: Logs out the user by removing the refresh token from the database.
+ *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *     responses:
  *       200:
- *         description: User logged out successfully
+ *         description: Log out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Log out successfully
  *       401:
- *         description: Unauthorized - JWT token missing or invalid
+ *         description: Invalid or missing refresh token
  */
 
 authRoute.post('/logout', authMiddleware, asyncHandler(logout));
@@ -234,7 +256,7 @@ authRoute.post("/resend-otp", otpLimiter, asyncHandler(resendOtp));
  *                 type: string
  *                 format: email
  *                 description: Registered email of the user
- *                 example: sandip@example.com
+ *                 example: songrasandip14@gmail.com
  *     responses:
  *       200:
  *         description: OTP sent successfully
@@ -266,7 +288,7 @@ authRoute.post("/forgot-password", otpLimiter, asyncHandler(forgotPassward))
  *                 type: string
  *                 format: email
  *                 description: Registered email of the user
- *                 example: sandip@example.com
+ *                 example: songrasandip14@gmail.com
  *               otp:
  *                 type: string
  *                 description: OTP received on email

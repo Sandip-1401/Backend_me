@@ -1,5 +1,7 @@
 import { AppError } from '../../common/errors/AppError';
 import { AppointmentStatusName } from '../../entities/appointment_status.entities';
+import { buildPagination } from '../../utils/pagination-response.util';
+import { getPagination } from '../../utils/pagination.util';
 import { AppointmentRepository } from '../appointment/appointment.repository';
 import { DoctorRepository } from '../doctor/doctor.repository';
 import { CreateMedicalRecordDto } from './dto/createMedicalRecordDto';
@@ -91,8 +93,17 @@ export class MedicalRecordService {
     return record;
   }
 
-  async getAllAppointment() {
-    const records = await this.medicalRecordRepository.getAll();
-    return records;
+  async getAllAppointment(query: any) {
+
+    const {page, limit, skip} = getPagination(query);
+
+    const search = query.search as string | undefined;
+
+    const sort = query.sort as string | undefined;
+    const order = (query.order as "ASC" | "DESC") || "ASC";
+
+    const [medical_records, total] = await this.medicalRecordRepository.getAll(skip, limit, sort, order, search);
+
+    return buildPagination(medical_records, total, page, limit)
   }
 }

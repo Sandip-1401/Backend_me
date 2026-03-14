@@ -1,3 +1,4 @@
+import { applyFilter, applyPagination, applySearch, applySorting } from '../../common/utils/FSSP/fssp.util';
 import { AppDataSource } from '../../config/datasource';
 import { MedicalRecord } from '../../entities/medical_records.entities';
 
@@ -44,13 +45,40 @@ export class MedicalRecordRepository {
     });
   }
 
-  async getAll() {
-    return this.medicalRecordRepository.find({
-      relations: {
-        appointment: true,
-        doctor: true,
-        patient: true,
-      },
-    });
+  async getAll(
+    skip: number,
+    limit: number,
+    sort?: string,
+    order: "ASC" | "DESC" = "ASC",
+    search?: string
+  ): Promise<[MedicalRecord[], number]>{
+
+    const query = this.medicalRecordRepository
+      .createQueryBuilder("medicalRecord")
+      .leftJoinAndSelect("medicalRecord.patient", "patient")
+      .leftJoinAndSelect("medicalRecord.doctor", "doctor")
+      .leftJoinAndSelect("medicalRecord.appointment", "appointment")
+      .leftJoinAndSelect("patient.user", "patuser")
+      .leftJoinAndSelect("doctor.user", "docuser")
+
+    // applyFilter
+    applySearch(query, ["medicalRecord.diagnosis", "medicalRecord.notes", "patuser.name", "docuser.name"], search);
+
+    const allowedSortFields = ["record_date"];
+
+    applySorting(query, "medicalRecord", sort, order, allowedSortFields);
+    applyPagination(query, skip, limit);
+
+    const [medical_record, total] = await query.getManyAndCount();
+
+    return [medical_record, total];
+
+    // return this.medicalRecordRepository.find({
+    //   relations: {
+    //     appointment: true,
+    //     doctor: true,
+    //     patient: true,
+    //   },
+    // });
   }
 }

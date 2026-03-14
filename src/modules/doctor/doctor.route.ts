@@ -76,7 +76,7 @@ doctorRoute.get(
   '/',
   authMiddleware,
   requireRole(['ADMIN', 'DOCTOR', 'PATIENT']),
-  asyncHandler(doctorController.getAllDoctors),
+  asyncHandler(doctorController.getAllDoctors), //FSSP done
 );
 
 /**

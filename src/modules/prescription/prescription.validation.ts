@@ -10,8 +10,8 @@ const prescriptionMedicineSchema = z.object({
 
 export const createPrescriptionSchema = z.object({
   medical_record_id: z.string().uuid(),
-  doctor_id: z.string().uuid(),
-  patient_id: z.string().uuid(),
+  // doctor_id: z.string().uuid(),
+  // patient_id: z.string().uuid(),
   notes: z.string().optional(),
   medicines: z.array(prescriptionMedicineSchema).min(1),
 });
