@@ -265,5 +265,5 @@ export class AuthService {
     await this.authRepository.deleteRefreshToken(refreshToken);
 
     return { message: 'Logged out successfully' };
-  }
+  };
 }

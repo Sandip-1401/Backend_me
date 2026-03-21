@@ -10,7 +10,6 @@ export class NotificationRepository {
     return await this.notificationRepository.save(notification);
   }
 
-  // get notifications of a user
   async getUserNotifications(receiverId: string) {
     return await this.notificationRepository.find({
       where: { receiver_id: receiverId },

@@ -23,7 +23,7 @@ export class NotificationService {
       reference_id: referenceId
     });
 
-    // future: socket emit here
+    // frontend ke bad socketIO v lagyenge...!
 
     return notification;
   }

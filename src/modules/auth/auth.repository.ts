@@ -45,7 +45,7 @@ export class AuthRepository {
     // if(!user) throw new AppError("Email user not found", 404, "EMAIL_USER_NOT_FOUND")
 
     return await this.authRepository.update(user_id, data);
-
+  
   }
 
   async deleteRefreshToken(refreshToken: string) {

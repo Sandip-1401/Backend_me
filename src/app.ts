@@ -18,9 +18,11 @@ import addressRoute from './modules/address/address.route';
 import departmentRoute from './modules/department/deparment.route';
 import notificationRoute from './modules/notification/notification.route';
 import { apiLimiter } from './middlewares/rateLimit.middleware';
+import cors from "cors";
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use(apiLimiter);
