@@ -10,7 +10,7 @@ const addressController = new AddressController();
 
 /**
  * @swagger
- * /api/addresses:
+ * /api/address:
  *   post:
  *     summary: Create address
  *     description: Create a new address for a user. Only users with PATIENT or DOCTOR roles can create an address.
@@ -70,7 +70,7 @@ addressRoute.post(
 
 /**
  * @swagger
- * /api/addresses/{addressId}:
+ * /api/address/{addressId}:
  *   patch:
  *     summary: Update address
  *     description: Update an existing address by address ID. Only users with PATIENT or DOCTOR roles can update their address.

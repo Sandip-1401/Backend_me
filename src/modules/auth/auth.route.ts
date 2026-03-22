@@ -43,7 +43,7 @@ const authRoute = Router();
  *         description: Invalid email or password
  */
 authRoute.post('/login', 
-  // loginLimiter , 
+  loginLimiter , 
   validate(loginSchema), 
   asyncHandler(login)
 );

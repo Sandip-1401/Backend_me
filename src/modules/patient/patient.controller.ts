@@ -10,8 +10,9 @@ export class PatientCntroller {
 
   createPatient = async (req: AuthRequest, res: Response) => {
     const data = req.body as CreatePatientDto;
-
-    const patient = await this.patientService.createPatient(data);
+    console.log("USER:", req.user);
+    const userId = String(req.user?.user_id);
+    const patient = await this.patientService.createPatient({...data, user_id: userId});
 
     return successResponse(res, 'Patient created Successfully', patient);
   };
