@@ -9,10 +9,11 @@ const authService = new AuthService();
 
 export const login = async (req: AuthRequest, res: Response) => {
   const dto: LoginDto = req.body;
-  const { user, accessToken, refreshToken } = await authService.login(dto);
+  const { user, role, accessToken, refreshToken } = await authService.login(dto);
   const data = {
     user_id: user.user_id,
     email: user.email,
+    role: role,
     accessToken: accessToken,
     refreshToken: refreshToken,
   };

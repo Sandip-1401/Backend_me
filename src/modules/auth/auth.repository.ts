@@ -2,10 +2,12 @@ import { AppError } from '../../common/errors/AppError';
 import { AppDataSource } from '../../config/datasource';
 import { RefreshToken } from '../../entities/refresh_token.entity';
 import { User } from '../../entities/user.entities';
+import { UserRole } from '../../entities/user_role.entities';
 
 export class AuthRepository {
   private authRepository = AppDataSource.getRepository(User);
   private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+  private userRoleRepository = AppDataSource.getRepository(UserRole);
 
   async createUser(data: Partial<User>) {
     const user = this.authRepository.create(data);
@@ -25,6 +27,28 @@ export class AuthRepository {
       relations: ['user'],
     });
   };
+
+  async findByUserId(userId: string){
+    const user = await this.authRepository.findOne({
+      where: {user_id: userId}
+    })
+    return user;
+  }
+
+  async findRoleByUserId(userId: string) {
+    const userRole = await this.userRoleRepository.findOne({
+      where: {
+        user: {
+          user_id: userId
+        }
+      },
+      relations: ["role"]
+    });
+
+    const role = userRole?.role.role_name
+
+    return role;
+  }
 
   async updateUserPassword(email: string, data: Partial<User>){
 

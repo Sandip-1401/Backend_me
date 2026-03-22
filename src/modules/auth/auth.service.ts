@@ -27,6 +27,10 @@ export class AuthService {
       throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
     }
 
+    const userId = user.user_id;
+    const role = await this.authRepository.findRoleByUserId(userId);
+    // if(!role) throw new AppError("User role not found", 404, "USER_ROLE_NOT_FOUND");
+
     const isMatch = await bcrypt.compare(dto.password, user.password_hash);
 
     if (!isMatch) {
@@ -53,7 +57,7 @@ export class AuthService {
 
     await this.refreshTokenRepository.save(refreshTokenEntity);
 
-    return { user, accessToken, refreshToken };
+    return { user, role, accessToken, refreshToken };
   }
 
   async register(dto: RegisterDto) {
@@ -266,4 +270,12 @@ export class AuthService {
 
     return { message: 'Logged out successfully' };
   };
+
+  async findRoleByUserId(userId: string){
+    const role = await this.authRepository.findRoleByUserId(userId);
+
+    if(!role) throw new AppError("User role not found", 404, "USER_ROLE_NOT_FOUND");
+
+    return role;
+  }
 }

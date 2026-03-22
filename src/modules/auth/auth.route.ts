@@ -42,7 +42,11 @@ const authRoute = Router();
  *       401:
  *         description: Invalid email or password
  */
-authRoute.post('/login', loginLimiter , validate(loginSchema), asyncHandler(login));
+authRoute.post('/login', 
+  // loginLimiter , 
+  validate(loginSchema), 
+  asyncHandler(login)
+);
 
 /**
  * @swagger
