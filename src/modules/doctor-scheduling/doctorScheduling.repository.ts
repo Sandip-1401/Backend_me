@@ -13,7 +13,9 @@ export class SchedulingRepository {
     return await this.schedulingRepository.find({
       where: { doctor: { doctor_id: doctorId } },
       relations: {
-        doctor: true,
+        doctor: {
+          user: true
+        },
       },
     });
   }
