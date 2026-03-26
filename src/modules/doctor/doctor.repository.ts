@@ -1,6 +1,6 @@
 import { ILike } from 'typeorm';
 import { AppDataSource } from '../../config/datasource';
-import { Doctor } from '../../entities/doctor.entities';
+import { Doctor, DoctorStatus } from '../../entities/doctor.entities';
 import { Appointment } from '../../entities/appointment.entities';
 import {
   AppointmentStatus,
@@ -50,7 +50,8 @@ export class DoctorRepository {
       .createQueryBuilder('doctor')
       .leftJoinAndSelect('doctor.user', 'user')
       .leftJoinAndSelect('doctor.department', 'department')
-      .leftJoinAndSelect('doctor.address', 'address');
+      .leftJoinAndSelect('doctor.address', 'address')
+      .where('doctor.status = :status', {status: DoctorStatus.ACTIVE})
 
     if (departmentId) {
       query.andWhere('department.department_id = :departmentId', {
@@ -59,12 +60,12 @@ export class DoctorRepository {
     }
 
     if (search) {
-      query.andWhere('(user.name ILIKE :search OR doctor.qualification ILIKE :search)', {
+      query.andWhere('(user.name ILIKE :search OR doctor.qualification ILIKE :search OR department.department_name ILIKE :search)', {
         search: `%${search}%`,
       });
     }
 
-    const allowedSortFields = ['experience_years', 'created_at'];
+    const allowedSortFields = ['experience_years', 'created_at', 'consultation_fee'];
 
     if (sort && allowedSortFields.includes(sort)) {
       query.orderBy(`doctor.${sort}`, order);

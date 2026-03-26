@@ -12,6 +12,7 @@ import { User } from '../../entities/user.entities';
 import { UserRole } from '../../entities/user_role.entities';
 import { buildPagination } from '../../utils/pagination-response.util';
 import { getPagination } from '../../utils/pagination.util';
+import { AuthRepository } from '../auth/auth.repository';
 import UserRoleRepository from '../user-role/user_role.repository';
 import { CreatePatientDto } from './dto/createPatientDto';
 import { UpdatePatientDto } from './dto/updatePatientDto';
@@ -25,6 +26,7 @@ export class PatientService {
   private userRepository = AppDataSource.getRepository(User);
   private appointmentRepository = AppDataSource.getRepository(Appointment);
   private appointmentStatusRepository = AppDataSource.getRepository(AppointmentStatus);
+  private authRepository  = new AuthRepository();
 
   async createPatient(data: CreatePatientDto) {
     const user = await this.userRepositoy.findOne({
@@ -39,7 +41,7 @@ export class PatientService {
       throw new AppError('User is not Verified by Admin yet!', 404, 'USER_NOT_VERIFIED');
     }
 
-    const existsPatient = await this.patientRepository.findByUserId(data.user_id);
+    const existsPatient = await this.patientRepository.findByUserId(String(data.user_id));
 
     if (existsPatient) {
       throw new AppError('Patient already exists', 409, 'PATIENT_ALREADY_EXISTS');
@@ -101,11 +103,13 @@ export class PatientService {
   }
 
   async findPatientByUserId(userId: string) {
-    const patient = await this.patientRepository.findByUserId(userId);
-    if (!patient) {
+    const patientNoRole = await this.patientRepository.findByUserId(userId);
+    if (!patientNoRole) {
       throw new AppError('Patient not found', 404, 'PATIENT_NOT_FOUND');
     }
-    return patient;
+    const role = await this.authRepository.findRoleByUserId(userId);
+    const patient = {...patientNoRole, Role: role}
+    return {patient};
   }
 
   async cancleAppointment(userId: string, appointmentId: string) {

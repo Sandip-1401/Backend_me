@@ -24,7 +24,7 @@ export class DepartmentRepository {
     order: 'ASC' | 'DESC' = 'ASC',
     search?: string,
   ): Promise<[Department[], number]> {
-    const query = await this.departmentRepository.createQueryBuilder('department');
+    const query = this.departmentRepository.createQueryBuilder('department');
 
     // applyFilter(query, )
     applySearch(query, ['department_name', 'description'], search);

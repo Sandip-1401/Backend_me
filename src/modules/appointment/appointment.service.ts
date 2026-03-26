@@ -3,7 +3,7 @@ import {
   AppointmentStatus,
   AppointmentStatusName,
 } from '../../entities/appointment_status.entities';
-import { Doctor } from '../../entities/doctor.entities';
+import { Doctor, DoctorStatus } from '../../entities/doctor.entities';
 import { Patient } from '../../entities/patient.entities';
 import { UserRole } from '../../entities/user_role.entities';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './appointment.dto';
@@ -34,9 +34,14 @@ export class AppointmentService {
     if (!patient) throw new AppError('Patient not found', 404, 'PATIENT_NOT_FOUND');
 
     const doctor = await this.doctorRepository.findOne({
-      where: { doctor_id: data.doctor_id },
+      where: { 
+        doctor_id: data.doctor_id,
+        status: DoctorStatus.ACTIVE
+      },
     });
     if (!doctor) throw new AppError('Doctor not found', 404, 'DOCTOR_NOT_FOUND');
+
+
 
     const selectedDate = new Date(data.appointment_date);
     const today = new Date();

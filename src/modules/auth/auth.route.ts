@@ -43,7 +43,7 @@ const authRoute = Router();
  *         description: Invalid email or password
  */
 authRoute.post('/login', 
-  loginLimiter , 
+  // loginLimiter , 
   validate(loginSchema), 
   asyncHandler(login)
 );
@@ -270,7 +270,11 @@ authRoute.post("/resend-otp", otpLimiter, asyncHandler(resendOtp));
  *         description: Validation error
  */
 
-authRoute.post("/forgot-password", otpLimiter, asyncHandler(forgotPassward))
+authRoute.post(
+  "/forgot-password", 
+  // otpLimiter, 
+  asyncHandler(forgotPassward)
+)
 
 /**
  * @swagger

@@ -17,6 +17,7 @@ import {
 } from '../../entities/appointment_status.entities';
 import { sendNotification } from '../../common/utils/sendNotification';
 import { NotificationType } from '../../entities/notification.entities';
+import { AuthRepository } from '../auth/auth.repository';
 
 const ALLOWED_UPDATE_FIELDS = [
   'qualification',
@@ -37,6 +38,7 @@ export class DoctorService {
   private userRoleRepository = new UserRoleRepository();
   private appointmentRepository = AppDataSource.getRepository(Appointment);
   private appointmentStatusRepository = AppDataSource.getRepository(AppointmentStatus);
+  private authRepository = new AuthRepository();
 
   async createDoctor(
     user_id: string,
@@ -97,7 +99,9 @@ export class DoctorService {
   async getDoctorByUserId(userId: string) {
     const doctor = await this.doctorRepository.findByUserId(userId);
     if (!doctor) throw new AppError('Doctor profile not found', 404, 'DOCTOR_PROFILE_NOT_FOUND');
-    return doctor;
+    const role = await this.authRepository.findRoleByUserId(userId);
+
+    return {doctor, role};
   }
 
   async getDoctorById(doctorId: string) {

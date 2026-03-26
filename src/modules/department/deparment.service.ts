@@ -41,11 +41,11 @@ export class DepartmentService {
       search,
     );
 
-    if ((departments.length = 0)) {
+    if ((departments.length === 0)) {
       throw new AppError('Department not found', 404, 'DEPARTMENT_NOT_FOUND');
     }
 
-    return buildPagination(department, total, page, limit);
+    return buildPagination(departments, total, page, limit);
   }
 
   async getById(department_id: string) {

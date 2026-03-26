@@ -13,7 +13,7 @@ const deparmentController = new DepartmentController();
  * /api/departments:
  *   get:
  *     summary: Get all departments
- *     description: Retrieve a list of all departments in the system. Only users with the ADMIN role can access this endpoint.
+ *     description: Retrieve a list of all departments in the system. Only users with the ADMIN and DOCTOR role can access this endpoint.
  *     tags:
  *       - Departments
  *     security:
@@ -30,7 +30,7 @@ const deparmentController = new DepartmentController();
 departmentRoute.get(
   '/',
   authMiddleware,
-  requireRole(['ADMIN']),
+  // requireRole(['ADMIN', 'DOCTOR']),
   asyncHandler(deparmentController.getAll), //FSSP done
 );
 

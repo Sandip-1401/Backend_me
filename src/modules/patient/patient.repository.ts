@@ -77,7 +77,16 @@ export class PatientRepository {
       where: {
         user: { user_id: userId },
       },
-      relations: ['user', 'address'],
+      relations: {
+        user: true,
+        address: true,
+        medical_records: true,
+        prescriptions: true,
+        bills: true,
+        appointments: {
+          doctor: true
+        }
+      },
     });
   }
 
