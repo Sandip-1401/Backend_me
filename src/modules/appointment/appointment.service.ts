@@ -172,7 +172,10 @@ export class AppointmentService {
 
       const slotTime = `${hour}:${minutes}`;
 
-      const slotCount = appointments.filter((a) => a.appointment_time === slotTime).length;
+      const slotCount = appointments.filter((a) => {
+        const dbTime = a.appointment_time.slice(0, 5);//Time format mismatch -> sloteTime - 09:00 and appointment_time - 09:00:00
+        return dbTime === slotTime
+      }).length;
 
       const maxPatients = schedule.max_patients ?? 1;
 
