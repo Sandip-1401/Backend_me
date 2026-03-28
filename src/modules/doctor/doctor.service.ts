@@ -97,11 +97,13 @@ export class DoctorService {
   }
 
   async getDoctorByUserId(userId: string) {
-    const doctor = await this.doctorRepository.findByUserId(userId);
-    if (!doctor) throw new AppError('Doctor profile not found', 404, 'DOCTOR_PROFILE_NOT_FOUND');
+    const doctorNoRole = await this.doctorRepository.findByUserId(userId);
+    if (!doctorNoRole) throw new AppError('Doctor profile not found', 404, 'DOCTOR_PROFILE_NOT_FOUND');
     const role = await this.authRepository.findRoleByUserId(userId);
 
-    return {doctor, role};
+    const doctor =  {...doctorNoRole, Role: role}
+
+    return {doctor};
   }
 
   async getDoctorById(doctorId: string) {

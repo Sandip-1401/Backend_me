@@ -35,6 +35,9 @@ export class AppointmentRepository {
       relations: {
         doctor: true,
         status: true,
+        patient: {
+          user: true
+        }
       },
       order: {
         appointment_date: 'ASC',
@@ -51,6 +54,9 @@ export class AppointmentRepository {
       relations: {
         patient: true,
         status: true,
+        doctor: {
+          user: true
+        }
       },
       order: {
         appointment_date: 'ASC',
