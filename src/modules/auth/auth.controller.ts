@@ -56,7 +56,7 @@ export const forgotPassward = async (req: AuthRequest, res: Response) => {
 };
 
 export const verifyResetPasswordOtp = async (req: AuthRequest, res: Response) => {
-  console.log(`enter controller`)
+
   const email = String(req.body.email);
   const otp = String(req.body.otp);
 

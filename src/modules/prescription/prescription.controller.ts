@@ -9,7 +9,7 @@ export class PrescriptionController {
   private prescriptionService = new PrescriptionService();
 
   createPrescription = async (req: AuthRequest, res: Response) => {
-    console.log(req.user?.user_id);
+
 
     if (!req.user?.user_id) {
       throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');

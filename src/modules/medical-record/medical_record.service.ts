@@ -15,7 +15,7 @@ export class MedicalRecordService {
   async createRecord(userId: string, data: CreateMedicalRecordDto) {
     
     const doctor = await this.doctorRepository.findByUserId(userId);
-    console.log(doctor);
+
     if (!doctor) throw new AppError('Doctor not found', 404, 'DOCTOR_NOT_FOUND');
 
     const appointment = await this.appointmentRepository.findById(data.appointment_id);

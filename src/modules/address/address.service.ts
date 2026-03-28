@@ -39,7 +39,7 @@ export class AddressService {
 
       let address;
 
-      // console.log(userId, "&", patient?.user.user_id, "&", doctor?.user.user_id);
+
 
       if (patient && patient.user.user_id === userId) {
         address = await this.addressRepository.updateAddress(addressId, data);

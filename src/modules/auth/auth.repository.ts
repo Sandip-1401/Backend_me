@@ -15,7 +15,7 @@ export class AuthRepository {
   }
 
   async findByEmail(email: string) {
-     console.log(`enter findByEmail`)
+
     return this.authRepository.findOne({
       where: { email: email },
     });

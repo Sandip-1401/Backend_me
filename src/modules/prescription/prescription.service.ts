@@ -38,7 +38,7 @@ export class PrescriptionService {
       }
 
       const doctor = await this.doctorRepository.findByUserId(userId);
-      console.log(doctor);
+
       if (!doctor) throw new AppError('Doctor not found', 404, 'DOCTOR_NOT_FOUND');
 
       if (doctor.doctor_id !== medicalRecord?.doctor.doctor_id) {

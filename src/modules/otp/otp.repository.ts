@@ -6,7 +6,7 @@ export class OtpRepository {
    private otpRepository = AppDataSource.getRepository(OtpVerification);
 
    async findByEmail(email: string) {
-           console.log(`enter findByEmail`)
+
 
       return await this.otpRepository.findOne({
          where: { email: email }
@@ -19,7 +19,7 @@ export class OtpRepository {
    }
 
    async findByEmailAndOtp(email: string, otp: string, type: OtpType){
-    console.log(`enter findByEmailAndOtp`)
+
       return await this.otpRepository.findOne({
          where: {
             email: email,
@@ -30,7 +30,7 @@ export class OtpRepository {
    }
 
    async updateOtpIsVerify(email: string, data: Partial<OtpVerification>){
-      console.log(`enter updateOtpIsVerify`)
+
       const row = await this.otpRepository.findOne({
          where: {
             email: email,

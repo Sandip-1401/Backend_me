@@ -180,7 +180,7 @@ export class AuthService {
   }
 
   async verifyResetPasswordOtp(email: string, otp: string, type: OtpType){
-    console.log(`enter verifyResetPasswordOtp`)
+
     const user = await this.authRepository.findByEmail(email);
 
     if(!user) throw new AppError("Email not found", 404, "EMAIL_NOT_FOUND");
@@ -190,7 +190,7 @@ export class AuthService {
     if(!isValid) throw new AppError("Invalid or expired OTP", 400, "INVALID_OTP");
 
     await this.otpService.isVerifyTrue(email, otp, type);
-     console.log(`exit verifyResetPasswordOtp`)
+
     return {
       message: `Enterd otp is valis, now you can change your password`
     }

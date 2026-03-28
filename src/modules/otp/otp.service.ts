@@ -39,7 +39,7 @@ export class OtpService {
    };
 
    async verifyOTP(email: string, otp: string) {
-     console.log(`enter verifyOTP`)
+
 
       const record = await this.otpRepository.findByEmail(email);
 
@@ -63,7 +63,7 @@ export class OtpService {
    }
 
    async isVerifyTrue(email: string, otp: string, type: OtpType){
-      console.log(`enter isVerifyTrue`)
+
 
       const otpRow = await this.otpRepository.findByEmailAndOtp(email, otp, type);
 

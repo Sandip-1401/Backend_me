@@ -12,7 +12,7 @@ export const requireRole = (roles: string[]) => {
 
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     const userId = req.user?.user_id;
-    console.log('UserID', userId);
+
     if (!userId) {
       throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
@@ -22,7 +22,7 @@ export const requireRole = (roles: string[]) => {
     });
 
     const roleIds = roleFound.map((role) => role.role_id);
-    // console.log(roleIds);
+
     const userRole = await userRoleRepository.findOne({
       where: {
         user: { user_id: userId },
@@ -30,7 +30,7 @@ export const requireRole = (roles: string[]) => {
         is_active: true,
       },
     });
-    console.log(userRole);
+
     if (!userRole) {
       throw new AppError('Forbidden', 403, 'FORBIDDEN');
     }
