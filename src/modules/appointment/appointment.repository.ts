@@ -65,6 +65,213 @@ export class AppointmentRepository {
     });
   }
 
+  async findPendingOfPatient(patientId: string, pendingStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        patient: { patient_id: patientId },
+        status: { appointment_status_id: pendingStatusId }
+      },
+      relations: {
+        doctor: {user: true},
+        status: true,
+        patient: true,
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findPendingOfDoctor(doctorId: string, pendingStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        doctor: { doctor_id: doctorId },
+        status: { appointment_status_id: pendingStatusId }
+      },
+      relations: {
+        patient: {user: true},
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findAllPending(pendingStatusId: string){
+    return await this.appointmentRepository.find({
+      where: { status: { appointment_status_id: pendingStatusId } },
+      relations: {
+        patient: true,
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findApprovedOfPatient(patientId: string, approvedStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        patient: { patient_id: patientId },
+        status: { appointment_status_id: approvedStatusId }
+      },
+      relations: {
+        doctor: {user: true},
+        status: true,
+        patient: true,
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findApprovedOfDoctor(doctorId: string, approvedStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        doctor: { doctor_id: doctorId },
+        status: { appointment_status_id: approvedStatusId }
+      },
+      relations: {
+        patient: {user: true},
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findAllApproved(approvedStatusId: string){
+    return await this.appointmentRepository.find({
+      where: { status: { appointment_status_id: approvedStatusId } },
+      relations: {
+        patient: true,
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+
+  async findCompletedOfPatient(patientId: string, completedStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        patient: { patient_id: patientId },
+        status: { appointment_status_id: completedStatusId }
+      },
+      relations: {
+        doctor: {user: true},
+        status: true,
+        patient: true,
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findCompletedOfDoctor(doctorId: string, completedStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        doctor: { doctor_id: doctorId },
+        status: { appointment_status_id: completedStatusId }
+      },
+      relations: {
+        patient: {user: true},
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findAllCompleted(completedStatusId: string){
+    return await this.appointmentRepository.find({
+      where: { status: { appointment_status_id: completedStatusId } },
+      relations: {
+        patient: true,
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+
+  async findCancelledOfPatient(patientId: string, cancelledStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        patient: { patient_id: patientId },
+        status: { appointment_status_id: cancelledStatusId }
+      },
+      relations: {
+        doctor: {user: true},
+        status: true,
+        patient: true,
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findCancelledOfDoctor(doctorId: string, cancelledStatusId: string){
+    return await this.appointmentRepository.find({
+      where: {
+        doctor: { doctor_id: doctorId },
+        status: { appointment_status_id: cancelledStatusId }
+      },
+      relations: {
+        patient: {user: true},
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+  async findAllCancelled(cancelledStatusId: string){
+    return await this.appointmentRepository.find({
+      where: { status: { appointment_status_id: cancelledStatusId } },
+      relations: {
+        patient: true,
+        status: true,
+        doctor: true
+      },
+      order: {
+        appointment_date: 'ASC',
+        appointment_time: 'ASC',
+      },
+    })
+  };
+
+
   async findAll(
     skip: number,
     limit: number,
@@ -139,5 +346,20 @@ export class AppointmentRepository {
 
   async deleteAppointment(appointmentId: string) {
     return await this.appointmentRepository.softDelete({ appointment_id: appointmentId });
+  };
+
+  async fetchById(appointmentId: string){
+    return await this.appointmentRepository.findOne({
+      where: {appointment_id: appointmentId},
+      relations: {
+        patient: {
+          user: true
+        },
+        doctor: {
+          user: true
+        },
+        status: true
+      }
+    })
   }
 }

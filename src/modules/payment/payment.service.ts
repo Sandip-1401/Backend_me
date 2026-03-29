@@ -53,8 +53,8 @@ export class PaymentService {
 
     await this.paymentRepository.saveBill(bill);
     sendNotification(
-      String(bill.appointment?.doctor.doctor_id),
-      bill.patient.patient_id,
+      String(bill.appointment?.doctor.user.user_id),
+      bill.patient.user.user_id,
       `Payment`,
       `Payment successfully done by ${bill.patient.user.name}`,
       NotificationType.PAYMENT,

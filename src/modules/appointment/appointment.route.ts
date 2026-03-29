@@ -216,6 +216,7 @@ appointmentRoute.patch(
   asyncHandler(appointmentController.updateAppointment),
 );
 
+
 /**
  * @swagger
  * /api/appointments/doctor/{id}/avilable-slots:
@@ -260,4 +261,143 @@ appointmentRoute.get(
   asyncHandler(appointmentController.getAvailableSlots),
 );
 
+/**
+ * @swagger
+ * /api/appointments/pending-appointment:
+ *   get:
+ *     summary: Get my pending appointments
+ *     description: Retrieve pending appointments associated with the currently authenticated user. Doctors see appointments assigned to them and patients see the appointments they booked.
+ *     tags:
+ *       - Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Appointments fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only DOCTOR or PATIENT can access this resource
+ */
+
+appointmentRoute.get(
+  '/pending-appointment', 
+  authMiddleware, 
+  requireRole(['ADMIN', 'DOCTOR', 'PATIENT']),
+  asyncHandler(appointmentController.getPendingAppointments)
+)
+
+/**
+ * @swagger
+ * /api/appointments/approved-appointment:
+ *   get:
+ *     summary: Get my approved appointments
+ *     description: Retrieve approved appointments associated with the currently authenticated user. Doctors see appointments assigned to them and patients see the appointments they booked.
+ *     tags:
+ *       - Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Appointments fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only DOCTOR or PATIENT can access this resource
+ */
+
+appointmentRoute.get(
+  '/approved-appointment', 
+  authMiddleware, 
+  requireRole(['ADMIN', 'DOCTOR', 'PATIENT']),
+  asyncHandler(appointmentController.getApprovedAppointments)
+)
+
+/**
+ * @swagger
+ * /api/appointments/completed-appointment:
+ *   get:
+ *     summary: Get my completed appointments
+ *     description: Retrieve completed appointments associated with the currently authenticated user. Doctors see appointments assigned to them and patients see the appointments they booked.
+ *     tags:
+ *       - Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Appointments fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only DOCTOR or PATIENT can access this resource
+ */
+
+appointmentRoute.get(
+  '/completed-appointment', 
+  authMiddleware, 
+  requireRole(['ADMIN', 'DOCTOR', 'PATIENT']),
+  asyncHandler(appointmentController.getCompletedAppointments)
+)
+
+/**
+ * @swagger
+ * /api/appointments/cancelled-appointment:
+ *   get:
+ *     summary: Get my cancelled appointments
+ *     description: Retrieve cancelled appointments associated with the currently authenticated user. Doctors see appointments assigned to them and patients see the appointments they booked.
+ *     tags:
+ *       - Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Appointments fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only DOCTOR or PATIENT can access this resource
+ */
+
+appointmentRoute.get(
+  '/cancelled-appointment', 
+  authMiddleware, 
+  requireRole(['ADMIN', 'DOCTOR', 'PATIENT']),
+  asyncHandler(appointmentController.getCancelledAppointments)
+)
+
+
+
+/**
+ * @swagger
+ * /api/appointments/{id}:
+ *   get:
+ *     summary: Get appointment by Id
+ *     description: Retrieve appointments by Id
+ *     tags:
+ *       - Appointments
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Appointment ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Appointments fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - DOCTOR ADMIN PATIENT can access this resource
+ */
+
+appointmentRoute.get(
+  '/:id',
+  authMiddleware,
+  requireRole(['DOCTOR', 'PATIENT', 'ADMIN']),
+  asyncHandler(appointmentController.getById),
+);
 export default appointmentRoute;

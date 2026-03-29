@@ -84,8 +84,8 @@ export class PrescriptionService {
       await medicineRepo.save(medicines);
 
       sendNotification(
-          doctor.doctor_id,
-          medicalRecord.patient.patient_id,
+          doctor.user.user_id,
+          medicalRecord.patient.user.user_id,
           `Prescription created`,
           `Your prescription for our appointment is ready`,
           NotificationType.APPOINTMENT,

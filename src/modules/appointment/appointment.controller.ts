@@ -57,4 +57,44 @@ export class AppointmentController {
 
     return successResponse(res, 'Available slots...', slots);
   };
+
+  getPendingAppointments = async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.user_id;
+
+    const appointments = await this.appointmentService.fetchPendingAppointments(String(userId));
+
+    return successResponse(res, 'Appointment fetched successfully', appointments);
+  }
+
+  getApprovedAppointments = async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.user_id;
+
+    const appointments = await this.appointmentService.fetchApprovedAppointments(String(userId));
+
+    return successResponse(res, 'Appointment fetched successfully', appointments);
+  }
+
+  getCompletedAppointments = async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.user_id;
+
+    const appointments = await this.appointmentService.fetchCompletedAppointments(String(userId));
+
+    return successResponse(res, 'Appointment fetched successfully', appointments);
+  }
+
+  getCancelledAppointments = async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.user_id;
+
+    const appointments = await this.appointmentService.fetchCancelledAppointments(String(userId));
+
+    return successResponse(res, 'Appointment fetched successfully', appointments);
+  };
+
+  getById = async (req: AuthRequest, res: Response) => {
+    const appointmentId = req.params.id;
+
+    const appointment = await this.appointmentService.getById(String(appointmentId));
+    
+    return successResponse(res, 'Appointment fetched successfully', appointment);
+  }
 }

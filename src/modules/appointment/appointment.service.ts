@@ -38,6 +38,9 @@ export class AppointmentService {
         doctor_id: data.doctor_id,
         status: DoctorStatus.ACTIVE
       },
+      relations: {
+        user: true
+      }
     });
     if (!doctor) throw new AppError('Doctor not found', 404, 'DOCTOR_NOT_FOUND');
 
@@ -127,8 +130,8 @@ export class AppointmentService {
     });
 
     await sendNotification(
-      patient.patient_id,
-      doctor.doctor_id,
+      patient.user.user_id,
+      doctor.user.user_id,
       `New Appointment`,
       `You have new appointment form ${patient.user.name}`,
       NotificationType.APPOINTMENT,
@@ -281,5 +284,136 @@ export class AppointmentService {
     }
 
     return roleRow?.role.role_name;
+  };
+
+
+  async fetchPendingAppointments(userId: string){
+    const patient = await this.patientRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let patientId;
+    if(patient){
+      patientId = patient?.patient_id;
+    }
+    const pendingStatus = await this.appointmentStatusRepository.findOne({
+      where: { status_name: AppointmentStatusName.BOOKED}
+    })
+    if(!pendingStatus) throw new AppError("Pendind statue not found", 404, "PENDING_STATUS_NOT_FOUND");
+    const pendingStatusId = pendingStatus?.appointment_status_id;
+
+    if(patient && pendingStatusId){
+      return await this.appointmentRepository.findPendingOfPatient(String(patientId), String(pendingStatusId))
+    }
+
+    const doctor = await this.doctorRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let doctorId;
+    if(doctor){
+      doctorId = doctor.doctor_id
+    }
+    if(doctor && pendingStatus){
+      return await this.appointmentRepository.findPendingOfDoctor(String(doctorId), pendingStatusId);
+    }
+    return await this.appointmentRepository.findAllPending(pendingStatusId)
+  }
+
+  async fetchApprovedAppointments(userId: string){
+    const patient = await this.patientRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let patientId;
+    if(patient){
+      patientId = patient?.patient_id;
+    }
+    const approvedStatus = await this.appointmentStatusRepository.findOne({
+      where: { status_name: AppointmentStatusName.APPROVED}
+    })
+    if(!approvedStatus) throw new AppError("Approved statue not found", 404, "APPROVED_STATUS_NOT_FOUND");
+    const approvedStatusId = approvedStatus?.appointment_status_id;
+
+    if(patient && approvedStatusId){
+      return await this.appointmentRepository.findApprovedOfPatient(String(patientId), String(approvedStatusId))
+    }
+
+    const doctor = await this.doctorRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let doctorId;
+    if(doctor){
+      doctorId = doctor.doctor_id
+    }
+    if(doctor && approvedStatus){
+      return await this.appointmentRepository.findApprovedOfDoctor(String(doctorId), approvedStatusId);
+    }
+    return await this.appointmentRepository.findAllApproved(approvedStatusId)
+  }
+
+
+  async fetchCompletedAppointments(userId: string){
+    const patient = await this.patientRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let patientId;
+    if(patient){
+      patientId = patient?.patient_id;
+    }
+    const completedStatus = await this.appointmentStatusRepository.findOne({
+      where: { status_name: AppointmentStatusName.COMPLETED}
+    })
+    if(!completedStatus) throw new AppError("Completed statue not found", 404, "COMPLETED_STATUS_NOT_FOUND");
+    const completedStatusId = completedStatus?.appointment_status_id;
+
+    if(patient && completedStatusId){
+      return await this.appointmentRepository.findCompletedOfPatient(String(patientId), String(completedStatusId))
+    }
+
+    const doctor = await this.doctorRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let doctorId;
+    if(doctor){
+      doctorId = doctor.doctor_id
+    }
+    if(doctor && completedStatus){
+      return await this.appointmentRepository.findCompletedOfDoctor(String(doctorId), completedStatusId);
+    }
+    return await this.appointmentRepository.findAllCompleted(completedStatusId)
+  }
+
+  async fetchCancelledAppointments(userId: string){
+    const patient = await this.patientRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let patientId;
+    if(patient){
+      patientId = patient?.patient_id;
+    }
+    const cancelledStatus = await this.appointmentStatusRepository.findOne({
+      where: { status_name: AppointmentStatusName.CANCELLED}
+    })
+    if(!cancelledStatus) throw new AppError("Cancelled statue not found", 404, "CANCELLED_STATUS_NOT_FOUND");
+    const cancelledStatusId = cancelledStatus?.appointment_status_id;
+
+    if(patient && cancelledStatusId){
+      return await this.appointmentRepository.findCancelledOfPatient(String(patientId), String(cancelledStatusId))
+    }
+
+    const doctor = await this.doctorRepository.findOne({
+      where: {user: {user_id: userId}}
+    })
+    let doctorId;
+    if(doctor){
+      doctorId = doctor.doctor_id
+    }
+    if(doctor && cancelledStatus){
+      return await this.appointmentRepository.findCancelledOfDoctor(String(doctorId), cancelledStatusId);
+    }
+    return await this.appointmentRepository.findAllCancelled(cancelledStatusId)
+  }
+
+  async getById(appointmentId: string){
+    if(!appointmentId) throw new AppError("appointment_id is missing", 404, "APPOINTMENT_ID_IS_MISSING");
+    return await this.appointmentRepository.fetchById(appointmentId)
   }
 }
