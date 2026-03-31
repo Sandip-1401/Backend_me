@@ -89,7 +89,8 @@ export class PrescriptionService {
           `Prescription created`,
           `Your prescription for our appointment is ready`,
           NotificationType.APPOINTMENT,
-          prescription.prescription_id
+          prescription.prescription_id,
+          new Date()
       )
 
       return prescription;

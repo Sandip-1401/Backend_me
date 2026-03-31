@@ -15,11 +15,11 @@ export class Payment {
   @Column({ type: 'varchar', nullable: true })
   transaction_id?: string;
 
-  @ManyToOne('Bill', 'payments', { nullable: false })
+  @ManyToOne('Bill', 'payments', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'bill_id' })
   bill!: Bill;
 
-  @ManyToOne('Patient', 'payments', { nullable: false })
+  @ManyToOne('Patient', 'payments', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 

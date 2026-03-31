@@ -21,11 +21,11 @@ export class Prescription {
   @JoinColumn({ name: 'medical_record_id' })
   medical_record!: MedicalRecord;
 
-  @ManyToOne('Doctor', { nullable: false })
+  @ManyToOne('Doctor', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'doctor_id' })
   doctor!: Doctor;
 
-  @ManyToOne('Patient', 'prescriptions', { nullable: false })
+  @ManyToOne('Patient', 'prescriptions', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 

@@ -135,7 +135,8 @@ export class AppointmentService {
       `New Appointment`,
       `You have new appointment form ${patient.user.name}`,
       NotificationType.APPOINTMENT,
-      appointment.appointment_id
+      appointment.appointment_id,
+      new Date()
     )
 
     return appointment;

@@ -157,12 +157,27 @@ export class PatientService {
   }
 
   async deletePatient(patientId: string) {
-    const result = await this.patientRepository.deletePatient(patientId);
+    
+    const patient = await this.patientRepository.findById(patientId);
+    if (!patient) throw new AppError('Patient not found', 404, 'PATIENT_NOT_FOUND');
+    
+    const user = patient.user
+    if(!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
+    const role = await this.roleRepository.findOne({
+      where: {role_name: "PATIENT"}
+    })
+    
+    if(!role) throw new AppError("Role not found", 404, "ROLE_NOT_FOUND");
+    
+    await this.userRoleRepository.deleteUserRole(user, role)
+    
+    const result = await this.patientRepository.deletePatient(patientId);
+    
     if (!result.affected) {
       throw new AppError('Patient not found', 404, 'PATIENT_NOT_FOUND');
     }
-
+    
     return true;
   }
 }

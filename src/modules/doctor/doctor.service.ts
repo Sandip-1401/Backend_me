@@ -169,12 +169,13 @@ export class DoctorService {
     });
 
     sendNotification(
-      doctor.doctor_id,
-      appointment.patient.patient_id,
+      doctor.user.user_id,
+      appointment.patient.user.user_id,
       `Appointment approved`,
       `Your appointment for Dr. ${doctor.user.name} is approved`,
       NotificationType.APPOINTMENT,
-      appointment.appointment_id
+      appointment.appointment_id,
+      new Date()
     )
 
     return approvedappointment;
@@ -192,7 +193,7 @@ export class DoctorService {
         appointment_id: appointmentId,
         doctor: { doctor_id: doctor.doctor_id },
       },
-      relations: { doctor: true, patient: true, status: true },
+      relations: { doctor: true, patient: {user: true}, status: true },
     });
 
     if (!appointment) {
@@ -216,12 +217,13 @@ export class DoctorService {
     });
 
     sendNotification(
-      doctor.doctor_id,
-      appointment.patient.patient_id,
+      doctor.user.user_id,
+      appointment.patient.user.user_id,
       `Appointment rejected`,
       `Your appointment for Dr. ${doctor.user.name} is reject`,
       NotificationType.APPOINTMENT,
-      appointment.appointment_id
+      appointment.appointment_id,
+      new Date()
     )
 
     return rejectedAppointment;

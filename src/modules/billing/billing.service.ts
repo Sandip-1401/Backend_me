@@ -86,7 +86,8 @@ export class BillingService {
       `Bill created`,
       `Bill for the our last appointment is ready`,
       NotificationType.PAYMENT,
-      bill.bill_id
+      bill.bill_id,
+      new Date()
     )
 
     return {

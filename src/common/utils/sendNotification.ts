@@ -9,7 +9,8 @@ export const sendNotification = async (
   title: string,
   message: string,
   type: NotificationType,
-  referenceId?: string
+  referenceId?: string,
+  created_at?: Date
 ) => {
   return notificationService.sendNotification(
     senderId,
@@ -17,6 +18,7 @@ export const sendNotification = async (
     title,
     message,
     type,
-    referenceId
+    referenceId,
+    created_at
   );
 };

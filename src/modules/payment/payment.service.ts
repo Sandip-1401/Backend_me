@@ -58,7 +58,8 @@ export class PaymentService {
       `Payment`,
       `Payment successfully done by ${bill.patient.user.name}`,
       NotificationType.PAYMENT,
-      payment.payment_id
+      payment.payment_id,
+      new Date()
     )
 
     return payment;

@@ -14,11 +14,11 @@ export class Bill {
   @PrimaryGeneratedColumn('uuid')
   bill_id!: string;
 
-  @ManyToOne('Patient', 'bills', { nullable: false })
+  @ManyToOne('Patient', 'bills', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @ManyToOne('Appointment', { nullable: true })
+  @ManyToOne('Appointment', { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'appointment_id' })
   appointment?: Appointment;
 

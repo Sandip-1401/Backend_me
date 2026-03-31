@@ -41,7 +41,7 @@ export class Patient {
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @ManyToOne('Address', { nullable: true })
+  @ManyToOne('Address', { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'address_id' })
   address?: Address;
 

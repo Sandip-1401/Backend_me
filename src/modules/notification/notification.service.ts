@@ -11,7 +11,8 @@ export class NotificationService {
     title: string,
     message: string,
     type: NotificationType,
-    referenceId?: string
+    referenceId?: string,
+    created_at?: Date,
   ) {
 
     const notification = await this.notificationRepo.createNotification({
@@ -20,7 +21,8 @@ export class NotificationService {
       title,
       message,
       type,
-      reference_id: referenceId
+      reference_id: referenceId,
+      created_at
     });
 
     // frontend ke bad socketIO v lagyenge...!

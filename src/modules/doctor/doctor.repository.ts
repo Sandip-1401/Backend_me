@@ -21,7 +21,11 @@ export class DoctorRepository {
       where: {
         user: { user_id: userId },
       },
-      relations: ['user', 'department', 'address'],
+      relations: {
+        user: true,
+        department: true,
+        address: true
+      },
     });
   }
 

@@ -18,15 +18,15 @@ export class MedicalRecord {
   @PrimaryGeneratedColumn('uuid')
   medical_record_id!: string;
 
-  @ManyToOne('Patient', 'medical_records', { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne('Patient', 'medical_records', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @ManyToOne('Doctor', 'medical_records', { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne('Doctor', 'medical_records', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'doctor_id' })
   doctor!: Doctor;
 
-  @OneToOne('Appointment', { nullable: false, onDelete: 'RESTRICT' })
+  @OneToOne('Appointment', { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'appointment_id' })
   appointment!: Appointment;
 

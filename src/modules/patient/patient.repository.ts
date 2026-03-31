@@ -117,7 +117,7 @@ export class PatientRepository {
   }
 
   async deletePatient(patientId: string) {
-    return this.patientRepository.softDelete(patientId);
+    return this.patientRepository.delete(patientId);
   }
 }
 
