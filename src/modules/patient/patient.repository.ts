@@ -35,6 +35,7 @@ export class PatientRepository {
   async findAllPatient(
     skip: number,
     limit: number,
+    gender?: 'MALE' | 'FEMALE' | 'OTHER',
     sort?: string,
     order: 'ASC' | 'DESC' = 'ASC',
     search?: string,
@@ -43,6 +44,12 @@ export class PatientRepository {
       .createQueryBuilder('patient')
       .leftJoinAndSelect('patient.user', 'user')
       .leftJoinAndSelect('patient.address', 'address');
+
+      if(gender){
+        query.where(`patient.gender = :gender`, {
+          gender
+        })
+      }
 
     if (search) {
       query.andWhere(

@@ -30,7 +30,7 @@ export class DoctorController {
 
   getAllDoctors = async (req: AuthRequest, res: Response) => {
     const doctors = await this.doctorService.getAllDoctors(req.query);
-    return successResponse(res, 'Doctors created successfully', doctors);
+    return successResponse(res, 'Doctors fetched successfully', doctors);
   };
 
   approveAppointment = async (req: AuthRequest, res: Response) => {

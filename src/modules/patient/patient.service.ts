@@ -88,12 +88,13 @@ export class PatientService {
 
     const sort = query.sort as string | undefined;
     const order = (query.order as 'ASC' | 'DESC') || 'ASC';
-
+    const gender = (query.gender as 'MALE' | 'FEMALE' | 'OTHER');
     const search = query.search as string | undefined;
 
     const [patient, total] = await this.patientRepository.findAllPatient(
       skip,
       limit,
+      gender,
       sort,
       order,
       search,
