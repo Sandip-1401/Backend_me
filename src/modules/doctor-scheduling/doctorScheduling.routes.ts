@@ -78,6 +78,27 @@ scheduleRoute.post(
 
 /**
  * @swagger
+ * /api/schedules/my-schedule:
+ *   get:
+ *     summary: Get my schedule
+ *     description: Retrieve Logged in doctor schedule 
+ *     tags:
+ *       - Doctor Schedules
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Doctor schedule fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       404:
+ *         description: Schedule not found for the doctor
+ */
+
+scheduleRoute.get('/my-schedule', authMiddleware, asyncHandler(controller.getMySchedules));
+
+/**
+ * @swagger
  * /api/schedules/{doctorId}:
  *   get:
  *     summary: Get doctor schedule

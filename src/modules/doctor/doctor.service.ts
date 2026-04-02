@@ -149,7 +149,7 @@ export class DoctorService {
         appointment_id: appointmentId,
         doctor: { doctor_id: doctor.doctor_id },
       },
-      relations: { doctor: true, patient: true, status: true },
+      relations: { doctor: {user: true}, patient: {user: true}, status: true },
     });
     if (!appointment) throw new AppError('Appointment not found', 404, 'APPOINTMENT_NOT_FOUND');
 

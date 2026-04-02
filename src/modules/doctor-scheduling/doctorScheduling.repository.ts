@@ -20,6 +20,23 @@ export class SchedulingRepository {
     });
   }
 
+  async findByUserId(userId: string){
+    return await this.schedulingRepository.find({
+      where: {
+        doctor: {
+          user: {
+            user_id: userId
+          }
+        }
+      },
+      relations: {
+        doctor: {
+          user: true
+        },
+      },
+    })
+  }
+
   async findByDoctorAndDay(doctorId: string, day: DayOfWeek) {
     return await this.schedulingRepository.findOne({
       where: {
