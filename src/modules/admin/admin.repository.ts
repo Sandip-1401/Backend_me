@@ -1,3 +1,4 @@
+import { applyFilter, applyPagination, applySearch, applySorting } from '../../common/utils/FSSP/fssp.util';
 import { AppDataSource } from '../../config/datasource';
 import { Doctor, DoctorStatus } from '../../entities/doctor.entities';
 import { User } from '../../entities/user.entities';
@@ -131,5 +132,31 @@ export class AdminRepository {
   async activeDoctor(doctorId: string, data: Partial<Doctor>) {
     const activeDoctor = this.doctorRepository.update(doctorId, data);
     return activeDoctor;
+  };
+
+  async getAllUser(
+    skip: number,
+    limit: number,
+    verified?: 'true' | 'false',
+    sort?: string,
+    order: "ASC" | "DESC" = "ASC",
+    search?: string
+  ): Promise<[User[], number]>{
+    const query = this.userRepository
+      .createQueryBuilder("user")
+
+    applyFilter(query, 'user.is_verified', verified)
+
+    applySearch(query, ['user.name', 'user.email', 'user.phone_number'], search)
+    
+    const allowedSortFields = ['created_at'];
+
+    applySorting(query, 'user', sort, order, allowedSortFields);
+
+    applyPagination(query, skip, limit);
+    
+    const [users, total] = await query.getManyAndCount()
+
+    return [users, total]
   }
 }

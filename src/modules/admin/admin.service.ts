@@ -67,9 +67,23 @@ export class AdminService {
   async verifiedUserById(userId: string) {
     const user = await this.adminRepository.findUnverifiedUserById(userId);
     if (user && user.is_verified) {
-      throw new AppError('User already verified', 404, 'USER_ALREADY_VERIFIED');
+      return await this.adminRepository.verifiedUserById(userId, { is_verified: false });
     }
 
     return await this.adminRepository.verifiedUserById(userId, { is_verified: true });
+  };
+
+  async allUsers(query: any) {
+
+    const {page, limit, skip} = getPagination(query);
+
+    const sort = query.sort as string | undefined;
+    const order = (query.order as 'ASC' | 'DESC') || 'ASC';
+    const search = query.search as string | undefined;
+    const verified = query.verified
+
+    const [users, total] =  await this.adminRepository.getAllUser(skip, limit, verified, sort, order, search);
+    
+    return buildPagination(users, total, page, limit)
   }
 }

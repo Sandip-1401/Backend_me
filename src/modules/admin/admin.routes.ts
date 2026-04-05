@@ -128,8 +128,33 @@ adminRoute.get(
 adminRoute.patch(
   '/verify-user/:id',
   authMiddleware,
-  requireRole(['ADMIN', 'DOCTOR', 'PATIENT']),
+  requireRole(['ADMIN']),
   asyncHandler(adminController.verifyUserById),
 );
+
+/**
+ * @swagger
+ * /api/admin/all-users:
+ *   get:
+ *     summary: Get All users
+ *     description: Retrieve a list of Users. Only users with the ADMIN role can access this endpoint.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Users fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only ADMIN can access Users
+ */
+
+adminRoute.get('/all-users', 
+  authMiddleware, 
+  requireRole(["ADMIN"]),
+  asyncHandler(adminController.allUsers
+))
 
 export default adminRoute;

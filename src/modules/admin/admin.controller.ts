@@ -25,4 +25,9 @@ export class AdminController {
     const verifyUser = await this.adminService.verifiedUserById(String(req.params.id));
     return successResponse(res, 'User is now verified...!', verifyUser);
   };
+
+  allUsers = async (req: AuthRequest, res: Response) => {
+    const allUsers = await this.adminService.allUsers(req.query);
+    return successResponse(res, 'All Users...', allUsers)
+  }
 }
