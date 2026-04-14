@@ -161,6 +161,65 @@ medicalRecordRoute.get(
 
 /**
  * @swagger
+ * /api/medical-records/my-records:
+ *   get:
+ *     summary: Get my medical records
+ *     description: Retrieve a paginated list of my medical records. This endpoint is accessible only by ADMIN users.
+ *     tags:
+ *       - Medical Records
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Medical records fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only Login user can access their medical records
+ */
+
+medicalRecordRoute.get(
+  '/my-records',
+  authMiddleware,
+  requireRole(['DOCTOR', 'PATIENT']),
+  asyncHandler(medicalRecordController.myMedicalRecords)
+)
+
+/**
+ * @swagger
+ * /api/medical-records/{medical_record_id}:
+ *   get:
+ *     summary: Get medical records by id
+ *     description: List of medical records by id.
+ *     tags:
+ *       - Medical Records
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: medical_record_id
+ *         required: true
+ *         description: Medical Record ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Medical records fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only Login user can access medical records
+ */
+
+medicalRecordRoute.get(
+  '/:medical_record_id',
+  authMiddleware,
+  asyncHandler(medicalRecordController.getMedicalRecoredById)
+)
+
+/**
+ * @swagger
  * /api/medical-records/doctor/{doctor_id}:
  *   get:
  *     summary: Get doctor medical records

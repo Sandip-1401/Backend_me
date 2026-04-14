@@ -1,8 +1,5 @@
 import { AppDataSource } from '../../config/datasource';
-import {
-  AppointmentStatus,
-  AppointmentStatusName,
-} from '../../entities/appointment_status.entities';
+import { AppointmentStatus, AppointmentStatusName } from '../../entities/appointment_status.entities';
 import { Doctor, DoctorStatus } from '../../entities/doctor.entities';
 import { Patient } from '../../entities/patient.entities';
 import { UserRole } from '../../entities/user_role.entities';

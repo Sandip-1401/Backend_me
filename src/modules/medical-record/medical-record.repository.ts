@@ -26,7 +26,9 @@ export class MedicalRecordRepository {
       where: { patient: { patient_id: patientId } },
       relations: {
         appointment: true,
-        doctor: true,
+        doctor: {
+          user: true
+        },
         patient: true,
       },
       order: { record_date: 'DESC' },
@@ -39,10 +41,49 @@ export class MedicalRecordRepository {
       relations: {
         appointment: true,
         doctor: true,
-        patient: true,
+        patient: {
+          user: true
+        },
       },
       order: { record_date: 'DESC' },
     });
+  }
+
+
+  async findByPatientId(patient_id: string, medical_recod_id: string) {
+    return await this.medicalRecordRepository.findOne({
+      where: {
+        patient: {
+          patient_id: patient_id,
+          user: true
+        },
+        medical_record_id: medical_recod_id
+      },
+      relations: {
+        doctor: {
+          user: true
+        },
+        appointment: true
+      }
+    })
+  }
+
+  async findByDoctorId(doctor_id: string, medical_recod_id: string) {
+    return await this.medicalRecordRepository.findOne({
+      where: {
+        doctor: {
+          doctor_id: doctor_id,
+          user: true
+        },
+        medical_record_id: medical_recod_id
+      },
+      relations: {
+        patient: {
+          user: true
+        },
+        appointment: true
+      }
+    })
   }
 
   async getAll(
@@ -51,7 +92,7 @@ export class MedicalRecordRepository {
     sort?: string,
     order: "ASC" | "DESC" = "ASC",
     search?: string
-  ): Promise<[MedicalRecord[], number]>{
+  ): Promise<[MedicalRecord[], number]> {
 
     const query = this.medicalRecordRepository
       .createQueryBuilder("medicalRecord")
@@ -61,7 +102,7 @@ export class MedicalRecordRepository {
       .leftJoinAndSelect("patient.user", "patuser")
       .leftJoinAndSelect("doctor.user", "docuser")
 
-    // applyFilter
+    // applyFilter...skip...
     applySearch(query, ["medicalRecord.diagnosis", "medicalRecord.notes", "patuser.name", "docuser.name"], search);
 
     const allowedSortFields = ["record_date"];

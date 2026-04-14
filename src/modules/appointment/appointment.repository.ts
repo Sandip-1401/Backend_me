@@ -20,8 +20,12 @@ export class AppointmentRepository {
     return await this.appointmentRepository.findOne({
       where: { appointment_id: appontmentId },
       relations: {
-        patient: true,
-        doctor: true,
+        patient: {
+          user: true
+        },
+        doctor: {
+          user: true
+        },
         status: true,
       },
     });
@@ -33,7 +37,9 @@ export class AppointmentRepository {
         patient: { patient_id: patientId },
       },
       relations: {
-        doctor: true,
+        doctor: {
+          user: true
+        },
         status: true,
         patient: {
           user: true

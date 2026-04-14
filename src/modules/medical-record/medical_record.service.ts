@@ -1,9 +1,12 @@
 import { AppError } from '../../common/errors/AppError';
+import { sendNotification } from '../../common/utils/sendNotification';
 import { AppointmentStatusName } from '../../entities/appointment_status.entities';
+import { NotificationType } from '../../entities/notification.entities';
 import { buildPagination } from '../../utils/pagination-response.util';
 import { getPagination } from '../../utils/pagination.util';
 import { AppointmentRepository } from '../appointment/appointment.repository';
 import { DoctorRepository } from '../doctor/doctor.repository';
+import PatientRepository from '../patient/patient.repository';
 import { CreateMedicalRecordDto } from './dto/createMedicalRecordDto';
 import { MedicalRecordRepository } from './medical-record.repository';
 
@@ -11,6 +14,7 @@ export class MedicalRecordService {
   private medicalRecordRepository = new MedicalRecordRepository();
   private appointmentRepository = new AppointmentRepository();
   private doctorRepository = new DoctorRepository();
+  private patientRepository = new PatientRepository();
 
   async createRecord(userId: string, data: CreateMedicalRecordDto) {
     
@@ -60,6 +64,15 @@ export class MedicalRecordService {
       notes: data.notes,
     });
 
+    await sendNotification(
+      appointment.doctor.user.user_id,
+      appointment.patient.user.user_id,
+      `Medical record created`,
+      `Dr.  ${appointment.doctor.user.name} create your Medical record for your appointment`,
+      NotificationType.APPOINTMENT,
+      appointment.appointment_id
+    )
+
     return record;
   }
 
@@ -91,6 +104,43 @@ export class MedicalRecordService {
         'DOCTOR_MEDICAL_RECORDS_NOT_FOUND',
       );
     return record;
+  }
+
+  async getMyRecords(userId: string){
+    const patient = await this.patientRepository.findByUserId(userId);
+
+    if(patient){
+      return await this.medicalRecordRepository.findByPatient(patient.patient_id)
+    }
+
+    const doctor = await this.doctorRepository.findByUserId(userId);
+
+    if(doctor){
+      return await this.medicalRecordRepository.findByDoctor(doctor.doctor_id)
+    }
+
+    throw new AppError("Logged in user is not nghter patient nor doctor", 400, "NO_PATIENT_NOR_DOCTOR");
+  }
+
+  async getMedicalRecordById(user_id: string, medical_recod_id: string){
+    if(!user_id){
+      throw new AppError("User not Found", 404, "USER_NOT_FOUND");
+    }
+
+    const patient = await this.patientRepository.findByUserId(user_id);
+
+
+    if(patient){
+      return await this.medicalRecordRepository.findByPatientId(patient.patient_id, medical_recod_id);
+    }
+
+    const doctor = await this.doctorRepository.findByUserId(user_id);
+
+    if(doctor){
+      return await this.medicalRecordRepository.findByDoctorId(doctor.doctor_id, medical_recod_id);
+    }
+
+    throw new AppError("Logged in user is not nghter patient nor doctor", 400, "NO_PATIENT_NOR_DOCTOR");
   }
 
   async getAllAppointment(query: any) {
