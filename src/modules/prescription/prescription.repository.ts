@@ -35,7 +35,9 @@ export class PrescriptionRepository {
       },
       relations: {
         medicines: true,
-        doctor: true,
+        doctor: {
+          user: true
+        },
         patient: true,
         medical_record: true,
       },
@@ -53,7 +55,9 @@ export class PrescriptionRepository {
       relations: {
         medicines: true,
         doctor: true,
-        patient: true,
+        patient: {
+          user: true
+        },
         medical_record: true,
       },
       order: {
@@ -69,8 +73,12 @@ export class PrescriptionRepository {
       },
       relations: {
         medicines: true,
-        doctor: true,
-        patient: true,
+        doctor: {
+          user: true
+        },
+        patient: {
+          user: true
+        },
         medical_record: {
           appointment: true,
         },

@@ -151,6 +151,23 @@ export class PrescriptionService {
     return prescriptions;
   }
 
+  async getMyPrescription(user_id: string){
+    const patient = await this.patientRepository.findByUserId(user_id);
+
+    if(patient){
+      return this.prescriptionRepository.findByPatient(patient.patient_id);
+    }
+
+    const doctor = await this.doctorRepository.findByUserId(user_id);
+
+    if(doctor){
+      return this.prescriptionRepository.findByDoctor(doctor.doctor_id)
+    }
+
+    throw new AppError("Logged in user is not nghter patient nor doctor", 400, "NO_PATIENT_NOR_DOCTOR");
+
+  }
+
   async getById(prescriptionId: string) {
     const prescription = await this.prescriptionRepository.findById(prescriptionId);
 

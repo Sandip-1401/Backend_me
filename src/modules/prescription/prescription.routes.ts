@@ -191,6 +191,32 @@ prescriptionRoute.get(
 
 /**
  * @swagger
+ * /api/prescriptions/my-prescription:
+ *   get:
+ *     summary: Get my Prescription
+ *     description: Retrieve a paginated list of my Prescription. This endpoint is accessible only by ADMIN users.
+ *     tags:
+ *       - Prescriptions
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Prescription fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Only Login user can access their Prescription
+ */
+
+prescriptionRoute.get(
+  '/my-prescription',
+  authMiddleware,
+  requireRole(['PATIENT', 'DOCTOR']),
+  asyncHandler(prescriptionController.getMyPrescription)
+)
+
+/**
+ * @swagger
  * /api/prescriptions/{prescriptionId}:
  *   get:
  *     summary: Get prescription by ID

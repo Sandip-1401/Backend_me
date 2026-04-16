@@ -59,6 +59,14 @@ export class PrescriptionController {
     return successResponse(res, 'Prescription fetched successfully', data);
   };
 
+  getMyPrescription = async (req: AuthRequest, res: Response) => {
+    const user_id = req.user?.user_id;
+
+    const prescription = await this.prescriptionService.getMyPrescription(String(user_id));
+
+    return successResponse(res, 'All you prescription', prescription);
+  }
+
   getById = async (req: AuthRequest, res: Response) => {
     const { prescriptionId } = req.params;
 
