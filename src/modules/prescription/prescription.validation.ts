@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const prescriptionMedicineSchema = z.object({
-  medicine_name: z.string().min(2),
+  medicine_name: z.string().min(1),
   dosage: z.string().min(1),
   frequency: z.string().min(1),
   duration_days: z.number().min(1),

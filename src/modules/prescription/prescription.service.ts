@@ -27,8 +27,12 @@ export class PrescriptionService {
       const medicalRecord = await medicalRecordRepo.findOne({
         where: { medical_record_id: data.medical_record_id },
         relations: {
-          doctor: true,
-          patient: true,
+          doctor: {
+            user: true
+          },
+          patient: {
+            user: true
+          },
           appointment: true
         },
       });
