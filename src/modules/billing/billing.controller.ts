@@ -22,4 +22,12 @@ export class BillingController {
 
     return successResponse(res, 'Bill fetched successfully', bill);
   };
+
+  getMyBills = async (req: AuthRequest, res: Response) => {
+    const user_id = String(req.user?.user_id)
+
+    const bill = await this.billingService.getMyBills(user_id);
+
+    return successResponse(res, "All my bills...", bill)
+  } 
 }

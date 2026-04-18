@@ -5,11 +5,14 @@ import { AppDataSource } from '../../config/datasource';
 import { Doctor } from '../../entities/doctor.entities';
 import { sendNotification } from '../../common/utils/sendNotification';
 import { NotificationType } from '../../entities/notification.entities';
+import PatientRepository from '../patient/patient.repository';
+import { AppError } from '../../common/errors/AppError';
 
 export class BillingService {
   private billingRepository = new BillingRepository();
   private prescriptionRepository = new PrescriptionRepository();
   private doctorRepository = AppDataSource.getRepository(Doctor);
+  private patientRepository = new PatientRepository();
 
   async generateBillFromPrescription(prescriptionId: string, userId: string) {
     const prescription = await this.prescriptionRepository.findById(prescriptionId);
@@ -81,8 +84,8 @@ export class BillingService {
     await this.billingRepository.createBillItems(items);
 
     sendNotification(
-      doctor.doctor_id,
-      patient.patient_id,
+      doctor.user.user_id,
+      patient.user.user_id,
       `Bill created`,
       `Bill for the our last appointment is ready`,
       NotificationType.PAYMENT,
@@ -104,5 +107,25 @@ export class BillingService {
     }
 
     return bill;
+  }
+
+  async getMyBills(user_id: string){
+    const patient = await this.patientRepository.findByUserId(user_id);
+
+    if(patient){
+      return await this.billingRepository.getBillByPatient(patient.patient_id)
+    }
+
+    const doctor = await this.doctorRepository.findOne({
+      where: {
+        user: {user_id: user_id}
+      }
+    });
+
+    if(doctor){
+      return await this.billingRepository.getBillByDoctors(doctor.doctor_id);
+    }
+
+    throw new AppError("Logged in user is not nghter patient nor doctor", 400, "NO_PATIENT_NOR_DOCTOR");
   }
 }

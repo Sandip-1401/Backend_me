@@ -31,6 +31,40 @@ export class BillingRepository {
     });
   }
 
+  async getBillByPatient(patient_id: string){
+    return this.billRepository.find({
+      where: {
+        patient: {patient_id: patient_id}
+      },
+      relations: {
+        appointment: {
+          doctor: {
+            user: true
+          }
+        },
+        
+      }
+    })
+  }
+
+  async getBillByDoctors(doctor_id: string){
+    return this.billRepository.find({
+      where: {
+        appointment: {
+          doctor: {
+            doctor_id: doctor_id
+          }
+        }
+      },
+      relations: {
+        patient: {
+          user: true
+        },
+        
+      }
+    })
+  }
+
   async findByBillId(billId: string) {
     return await this.billRepository.findOne({
       where: { bill_id: billId },

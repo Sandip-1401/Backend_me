@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { BillingController } from './billing.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { requireRole } from '../../middlewares/role.middleware';
+import { asyncHandler } from '../../common/utils/asyncHandler';
 
 const router = Router();
 const billingController = new BillingController();
@@ -41,7 +42,7 @@ router.post(
   '/generate/:prescriptionId',
   authMiddleware,
   requireRole(['DOCTOR']),
-  billingController.generateBill,
+  asyncHandler(billingController.generateBill),
 );
 
 /**
@@ -77,7 +78,35 @@ router.get(
   '/appointment/:appointmentId',
   authMiddleware,
   requireRole(['DOCTOR', 'ADMIN', 'PATIENT']),
-  billingController.getBillByAppointment,
+  asyncHandler(billingController.getBillByAppointment),
 );
+
+/**
+ * @swagger
+ * /api/billing/my-bills:
+ *   get:
+ *     summary: Get my bills
+ *     description: Retrieve the bill associated with a Logged in user.
+ *     tags:
+ *       - Billing
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Bill fetched successfully
+ *       401:
+ *         description: Unauthorized - JWT token missing or invalid
+ *       403:
+ *         description: Forbidden - Access denied for this role
+ *       404:
+ *         description: Bill not found for the appointment
+ */
+
+router.get(
+  '/my-bills',
+  authMiddleware,
+  requireRole(['DOCTOR', 'PATIENT']),
+  asyncHandler(billingController.getMyBills)
+)
 
 export default router;
