@@ -23,6 +23,7 @@ export class BillingService {
 
     const doctor = await this.doctorRepository.findOne({
       where: { user: { user_id: userId } },
+      relations: {user: true}
     });
 
     if (!doctor) {
@@ -43,17 +44,21 @@ export class BillingService {
       throw new Error('Bill already exists for this appointment');
     }
 
+    // --- ACCOUNTING CALCULATION START ---
     let totalAmount = 0;
-
     let discount_amount = 0;
 
     const billItems = medicines.map((medicine) => {
-      const quantity = medicine.duration_days;
+      // Correct Quantity: Days * Frequency count (e.g. "1-1-1" = 3)
+      const timesPerDay = medicine.frequency.split('-').filter(f => f === '1').length || 1;
+      const quantity = medicine.duration_days * timesPerDay;
+
       const unitPrice = Number(medicine.unit_price || 0);
-      const amount = quantity * unitPrice;
+      const amount = Number((quantity * unitPrice).toFixed(2));
 
       totalAmount += amount;
-      discount_amount += amount / 5;
+      // 20% discount calculation
+      discount_amount += Number((amount * 0.20).toFixed(2));
 
       return {
         item_type: 'MEDICINE',
@@ -62,17 +67,25 @@ export class BillingService {
         amount,
       };
     });
-    
-    doctor.consultation_fee ? totalAmount += doctor.consultation_fee : totalAmount += 0;
+
+    // Adding Consultation Fee
+    const consultationFee = Number(doctor.consultation_fee || 0);
+    totalAmount += consultationFee;
+
+    // Final Net Totals
+    const finalTotal = Number(totalAmount.toFixed(2));
+    const finalDiscount = Number(discount_amount.toFixed(2));
+    const finalNet = Number((finalTotal - finalDiscount).toFixed(2));
+    // --- ACCOUNTING CALCULATION END ---
 
     const bill = await this.billingRepository.createBill({
       patient,
       appointment,
       bill_number: `BILL-${Date.now()}`,
       bill_date: new Date(),
-      total_amount: totalAmount,
-      discount_amount: discount_amount,
-      net_amount: totalAmount - discount_amount,
+      total_amount: finalTotal,
+      discount_amount: finalDiscount,
+      net_amount: finalNet,
       status: BillStatus.PENDING,
     });
 
@@ -91,7 +104,7 @@ export class BillingService {
       NotificationType.PAYMENT,
       bill.bill_id,
       new Date()
-    )
+    );
 
     return {
       bill,
@@ -109,20 +122,20 @@ export class BillingService {
     return bill;
   }
 
-  async getMyBills(user_id: string){
+  async getMyBills(user_id: string) {
     const patient = await this.patientRepository.findByUserId(user_id);
 
-    if(patient){
+    if (patient) {
       return await this.billingRepository.getBillByPatient(patient.patient_id)
     }
 
     const doctor = await this.doctorRepository.findOne({
       where: {
-        user: {user_id: user_id}
+        user: { user_id: user_id }
       }
     });
 
-    if(doctor){
+    if (doctor) {
       return await this.billingRepository.getBillByDoctors(doctor.doctor_id);
     }
 

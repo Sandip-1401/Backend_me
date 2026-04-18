@@ -26,7 +26,9 @@ export class BillingRepository {
       relations: {
         items: true,
         payments: true,
-        patient: true,
+        patient: {
+          user: true
+        },
       },
     });
   }
@@ -37,12 +39,7 @@ export class BillingRepository {
         patient: {patient_id: patient_id}
       },
       relations: {
-        appointment: {
-          doctor: {
-            user: true
-          }
-        },
-        
+        appointment: true
       }
     })
   }
@@ -57,10 +54,10 @@ export class BillingRepository {
         }
       },
       relations: {
+        appointment: true,
         patient: {
           user: true
-        },
-        
+        }
       }
     })
   }
