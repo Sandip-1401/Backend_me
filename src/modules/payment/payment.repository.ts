@@ -14,7 +14,9 @@ export class PaymentRepository {
           user: true
         },
         appointment: {
-          doctor: true
+          doctor: {
+            user: true
+          }
         },
         
       },

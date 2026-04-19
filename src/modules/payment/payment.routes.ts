@@ -38,7 +38,7 @@ const paymentController = new PaymentController();
 paymentRoute.get(
   '/qr/:billId',
   authMiddleware,
-  requireRole(['DOCTOR']),
+  requireRole(['DOCTOR', 'PATIENT']),
   paymentController.generateQR,
 );
 

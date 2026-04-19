@@ -39,7 +39,11 @@ export class BillingRepository {
         patient: {patient_id: patient_id}
       },
       relations: {
-        appointment: true
+        appointment: {
+          doctor: {
+            user: true
+          }
+        }
       }
     })
   }
